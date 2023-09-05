@@ -1,0 +1,8 @@
+0. Delete the .git.
+1. Rename the folder from tdd_template to your driver that you're building.
+2. Put your source code in src and inc
+3. Put your spies in test_harness->spies
+4. Put your fakes in test_harness->fakes
+5. Put your tests in test_harness->tests
+6. The doxyfile only produces docs for what's in the inc folder. You might need to change the project name.
+7. To run tests cd test_harness then run "make". You will need the cppUTest library installed on your system and CPPUTEST_HOME environment variable set.
