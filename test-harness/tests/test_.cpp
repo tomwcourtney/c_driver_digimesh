@@ -41,6 +41,9 @@ TEST_GROUP(Test)
     #define IS_OK(status)\
         CHECK(status == DIGI_OK);
 
+    #define IS_NOT_OK(status)\
+        CHECK(!status == DIGI_OK);
+
     #define ARE_MESSAGES_EQUAL(message_a, message_b, message_length) \
         CHECK(are_two_message_equal(message_a, message_b, message_length));
 };
@@ -74,6 +77,14 @@ TEST(Test, check_that_you_cant_make_a_value_larger_than_max_value_len)
     IS_OK(!digi_generate_set_field_message(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
 }
 
+TEST(Test, validate_channel_value)
+{
+    uint8_t channel[] = {0x0A};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+
+    IS_NOT_OK(digi_generate_set_field_message(DIGIMESH_AT_CH, channel , sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+}
+
 TEST(Test, check_set_network_id_frame)
 {
     uint8_t id[] = {0x0A};
@@ -88,12 +99,12 @@ TEST(Test, check_set_network_id_frame)
 
 TEST(Test, check_set_channel_frame)
 {
-    uint8_t channel[] = {0x0A};
+    uint8_t channel[] = {0x0B};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
     IS_OK(digi_generate_set_field_message(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
 
-    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0A, 0x61};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
 
     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
 }
@@ -109,6 +120,7 @@ TEST(Test, check_set_name_frame)
 
     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
 }
+
 
 /********/
 /* Many */

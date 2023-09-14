@@ -149,6 +149,47 @@ digi_status_t generate_byte_array_from_frame(digi_frame_at_command_t * frame, ui
    
     return DIGI_OK;
 }
+
+bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
+{
+    if(value_length > DIGIMESH_MAXIMUM_MESSAGE_SIZE)
+    {
+        return false;
+    }
+
+    switch(field)
+    {
+        case DIGIMESH_AT_ID:
+            return !(value_length > 2);
+        break;
+
+        case DIGIMESH_AT_CH:
+            return !(value_length > 1) && (value[0] <= 0x1A && value[0] >= 0x0B);
+        break;
+
+        case DIGIMESH_AT_NI:
+            if (!(value_length > 20))
+            {
+                for(uint8_t idx = 0; idx < value_length; idx++)
+                {
+                    if(value[idx] < 0 || value[idx] > 127)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        break;
+
+        default:
+            return false;
+        break;
+    }
+}
 /*******************************/
 /* PUBLIC FUNCTION DEFINITIONS */
 /*******************************/
@@ -195,7 +236,7 @@ digi_status_t digi_register(digi_serial_t * serial)
 
 digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
 {
-    if(value_length > DIGIMESH_MAXIMUM_MESSAGE_SIZE)
+    if(!value_is_valid(field, value, value_length))
     {
         return DIGI_ERROR;
     }
