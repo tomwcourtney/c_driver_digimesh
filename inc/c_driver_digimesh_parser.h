@@ -1,3 +1,12 @@
+/**
+ * @file c_driver_digimesh_parser.h
+ * @brief For generating and parsing DigiMesh compliant messages.
+ * @version 0.1
+ * @date 2023-09-14
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #ifndef DIGIMESH_PARSER_H
 #define DIGIMESH_PARSER_H
 
@@ -16,7 +25,7 @@
 /**
  * @brief The maximum size of a byte array representing a message
  */
-#define MAXIMUM_MESSAGE_SIZE 128
+#define DIGI_MAXIMUM_MESSAGE_SIZE 128
 
 
 /****************/
@@ -47,9 +56,10 @@ typedef struct digi_t digi_t;
  * @brief For identifying what digi device field you want to set or get.
  */
 typedef enum{
-    DIGI_FIELD_ID,
-    DIGI_FIELD_END
-}digi_field_t;
+    DIGI_AT_ID,
+    DIGI_AT_CH,
+    DIGI_AT_END
+}digi_at_command_t;
 
 
 
@@ -75,7 +85,7 @@ bool digi_is_initialized(void);
 /**
  * @brief Populates an array with the digimesh serial number
  * 
- * @param serial - pointer to a digi serial object for population.
+ * @param [in] serial - pointer to a digi serial object for population.
  * 
  * @return digi_status_t 
  */
@@ -84,10 +94,24 @@ digi_status_t digi_get_serial(digi_serial_t * serial);
 /**
  * @brief Stores the state information of a digi module
  * 
- * @param serial - Digi serial number object used to give information to the digi module
+ * @param [in] serial - Digi serial number object used to give information to the digi module
+ * 
  * @return digi_status_t
  */
 digi_status_t digi_register(digi_serial_t * serial);
+
+
+/**
+ * @brief Create a byte array representing a DigiMesh protocol compliant message that can be used to set
+ * the value of a configurable field on a Digi module.
+ * 
+ * @param [in] field            - Selects what field you want to set.
+ * @param [in] value            - Sets the value that you want to set the field to.
+ * @param [in] value_length     - The nummber of bytes in the value field
+ * @param [out] message         - Is used to store the resulting message.
+ * @return digi_status_t 
+ */
+digi_status_t digi_generate_set_field_message(digi_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
 
 
 
