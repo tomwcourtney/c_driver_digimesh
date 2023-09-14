@@ -20,12 +20,12 @@
 /**
  * @brief Bytes in a digi module serial number
  */
-#define DIGI_SERIAL_LENGTH 8
+#define DIGIMESH_SERIAL_LENGTH 8
 
 /**
  * @brief The maximum size of a byte array representing a message
  */
-#define DIGI_MAXIMUM_MESSAGE_SIZE 128
+#define DIGIMESH_MAXIMUM_MESSAGE_SIZE 128
 
 
 /****************/
@@ -44,7 +44,7 @@ typedef enum{
  * @brief Type that enforces the correct size for the serial.
  */
 typedef struct{
-    uint8_t serial[DIGI_SERIAL_LENGTH];
+    uint8_t serial[DIGIMESH_SERIAL_LENGTH];
 }digi_serial_t;
 
 /**
@@ -56,10 +56,10 @@ typedef struct digi_t digi_t;
  * @brief For identifying what digi device field you want to set or get.
  */
 typedef enum{
-    DIGI_AT_ID,
-    DIGI_AT_CH,
-    DIGI_AT_END
-}digi_at_command_t;
+    DIGIMESH_AT_ID,
+    DIGIMESH_AT_CH,
+    DIGIMESH_AT_END
+}digimesh_at_command_t;
 
 
 
@@ -111,7 +111,7 @@ digi_status_t digi_register(digi_serial_t * serial);
  * @param [out] message         - Is used to store the resulting message.
  * @return digi_status_t 
  */
-digi_status_t digi_generate_set_field_message(digi_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
+digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
 
 
 

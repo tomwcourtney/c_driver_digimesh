@@ -34,7 +34,7 @@
  * @param serial - the serial number of the digi module
  */
 struct digi_t{
-    uint8_t serial[DIGI_SERIAL_LENGTH];
+    uint8_t serial[DIGIMESH_SERIAL_LENGTH];
 };
 
 /**
@@ -92,7 +92,7 @@ digi_t digi = {0};
 
 // List of ascii strings representing differenct fields. Can be
 // indexed by digi_field_t.
-char digi_at_command_strings[DIGI_AT_END][AT_COMMAND_STRING_LEN] = 
+char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
 {
     {'I','D'},      // The network identifiying number of the digi module
     {'C','H'}       // The network channel of the digi module
@@ -154,7 +154,7 @@ digi_status_t generate_byte_array_from_frame(digi_frame_at_command_t * frame, ui
 
 void digi_init(void)
 {
-    memset(digi.serial, EMPTY_SERIAL, DIGI_SERIAL_LENGTH);
+    memset(digi.serial, EMPTY_SERIAL, DIGIMESH_SERIAL_LENGTH);
 
     return;   
 }
@@ -163,7 +163,7 @@ bool digi_is_initialized()
 {
     // Check what the value of the digi state is to see if it's empty.
     // It's deemed empty if its serial is all empty values.
-    for(uint8_t idx = 0; idx < DIGI_SERIAL_LENGTH; idx++)
+    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_LENGTH; idx++)
     {
         if(digi.serial[idx] == EMPTY_SERIAL){
             continue;
@@ -180,19 +180,19 @@ bool digi_is_initialized()
 
 digi_status_t digi_get_serial(digi_serial_t * serial)
 {
-    memcpy(serial->serial, digi.serial, DIGI_SERIAL_LENGTH);
+    memcpy(serial->serial, digi.serial, DIGIMESH_SERIAL_LENGTH);
 
     return DIGI_OK;
 }
 
 digi_status_t digi_register(digi_serial_t * serial)
 {
-    memcpy(digi.serial, &(serial->serial[0]), DIGI_SERIAL_LENGTH);
+    memcpy(digi.serial, &(serial->serial[0]), DIGIMESH_SERIAL_LENGTH);
 
     return DIGI_OK;
 }
 
-digi_status_t digi_generate_set_field_message(digi_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
+digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
 {
     digi_frame_at_command_t frame = {
         .start_delimiter = 0x7E,
