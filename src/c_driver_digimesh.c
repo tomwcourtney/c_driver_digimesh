@@ -95,7 +95,8 @@ digi_t digi = {0};
 char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
 {
     {'I','D'},      // The network identifiying number of the digi module
-    {'C','H'}       // The network channel of the digi module
+    {'C','H'},      // The network channel of the digi module
+    {'N','I'}       // The name of the digi module
 };
 
 /*********************************/

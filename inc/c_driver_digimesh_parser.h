@@ -58,6 +58,7 @@ typedef struct digi_t digi_t;
 typedef enum{
     DIGIMESH_AT_ID,
     DIGIMESH_AT_CH,
+    DIGIMESH_AT_NI,
     DIGIMESH_AT_END
 }digimesh_at_command_t;
 
