@@ -1,4 +1,4 @@
-#include "c_driver_digimesh_parser.h"
+#include "c_driver_digimesh.h"
 
 #include <string.h>
 
@@ -16,7 +16,7 @@
  * @brief This is the maximum number of bytes that the value field of a
  * at command message can be.
  */
-#define MAX_FIELD_SIZE 0x02
+#define MAX_FIELD_SIZE 0xFF
 
 /**
  * @brief The maximum length of the ascii representation of an at command type.
@@ -195,6 +195,11 @@ digi_status_t digi_register(digi_serial_t * serial)
 
 digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
 {
+    if(value_length > DIGIMESH_MAXIMUM_MESSAGE_SIZE)
+    {
+        return DIGI_ERROR;
+    }
+
     digi_frame_at_command_t frame = {
         .start_delimiter = 0x7E,
         .length = (1 + 1 + 2 + value_length),       // sizeof(frame_type) + sizeof(frame_id) + sizeof(at_command) + value_length
@@ -211,4 +216,9 @@ digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8
     
 
     return DIGI_OK;
+}
+
+uint8_t digimesh_get_frame_size(uint8_t * frame)
+{
+  return ((frame[1] << 8 | frame[2]) + 4);
 }

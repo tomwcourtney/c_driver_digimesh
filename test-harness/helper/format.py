@@ -15,7 +15,7 @@ c_byte_array = ", ".join(f"0x{val}" for val in hex_values_list)
 array_length = len(hex_values_list)
 
 # Print the byte array in C format
-print(f"= {{{c_byte_array}}}")
+print(f"uint8_t expected_frame[] = {{{c_byte_array}}};")
 
 # Print the length of the array
 print(f"Length of the array: {array_length}")

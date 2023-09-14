@@ -115,5 +115,13 @@ digi_status_t digi_register(digi_serial_t * serial);
 digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
 
 
+/**
+ * @fn uint8_t digimesh_get_frame_size(uint8_t*)
+ * @brief Determines the total number of bytes in a frame. This includes start bytes and crc.
+ *
+ * @param frame - the digimesh frame whose length needs to be determined.
+ * @return Total size of the frame in bytes.
+ */
+uint8_t digimesh_get_frame_size(uint8_t * frame);
 
 #endif
