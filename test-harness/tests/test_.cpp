@@ -74,7 +74,7 @@ TEST(Test, check_that_you_cant_make_a_value_larger_than_max_value_len)
     uint8_t name[DIGIMESH_MAXIMUM_MESSAGE_SIZE+1] = {0};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
-    IS_OK(!digi_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
+    IS_OK(!digimesh_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
 }
 
 TEST(Test, validate_channel_value)
@@ -82,7 +82,7 @@ TEST(Test, validate_channel_value)
     uint8_t channel[] = {0x0A};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
-    IS_NOT_OK(digi_generate_at_command_frame(DIGIMESH_AT_CH, channel , sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+    IS_NOT_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel , sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
 }
 
 TEST(Test, check_set_network_id_frame)
@@ -90,7 +90,7 @@ TEST(Test, check_set_network_id_frame)
     uint8_t id[] = {0x0A};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
-    IS_OK(digi_generate_at_command_frame(DIGIMESH_AT_ID, id, sizeof(id)/sizeof(id[0]), generated_frame));
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_ID, id, sizeof(id)/sizeof(id[0]), generated_frame));
     
     uint8_t expected_message[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x49, 0x44, 0x0A, 0x5F};
 
@@ -102,7 +102,7 @@ TEST(Test, check_set_channel_frame)
     uint8_t channel[] = {0x0B};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
-    IS_OK(digi_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
 
     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
 
@@ -114,7 +114,7 @@ TEST(Test, check_set_name_frame)
     uint8_t name[] = {'c','r','u','m','b'};
     uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
 
-    IS_OK(digi_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
 
     uint8_t expected_frame[] = {0x7E, 0x00, 0x09, 0x08, 0x01, 0x4E, 0x49, 0x63, 0x72, 0x75, 0x6D, 0x62, 0x46};
 
