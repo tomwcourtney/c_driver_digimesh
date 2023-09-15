@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['digi_5fserial_5ft_0',['digi_serial_t',['../structdigi__serial__t.html',1,'']]]
+  ['digimesh_5fserial_5ft_0',['digimesh_serial_t',['../structdigimesh__serial__t.html',1,'']]]
 ];
