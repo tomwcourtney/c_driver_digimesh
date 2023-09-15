@@ -341,7 +341,7 @@ digi_status_t digi_register(digimesh_serial_t * serial)
     return DIGI_OK;
 }
 
-digi_status_t digi_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
+digi_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
 {
     if(!value_is_valid(field, value, value_length))
     {
