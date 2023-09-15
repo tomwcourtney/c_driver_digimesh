@@ -18,9 +18,9 @@
 /**********************/
  
 /**
- * @brief Bytes in a digi module serial number
+ * @brief Bytes in a digi module serial number. The serial number is also the address of a digi module when sending a message.
  */
-#define DIGIMESH_SERIAL_LENGTH 8
+#define DIGIMESH_SERIAL_NUMBER_LENGTH 8
 
 /**
  * @brief The maximum size of a byte array representing a message
@@ -44,8 +44,8 @@ typedef enum{
  * @brief Type that enforces the correct size for the serial.
  */
 typedef struct{
-    uint8_t serial[DIGIMESH_SERIAL_LENGTH];
-}digi_serial_t;
+    uint8_t serial[DIGIMESH_SERIAL_NUMBER_LENGTH];
+}digimesh_serial_t;
 
 /**
  * @brief Holds state information about a digimodule.
@@ -90,7 +90,7 @@ bool digi_is_initialized(void);
  * 
  * @return digi_status_t 
  */
-digi_status_t digi_get_serial(digi_serial_t * serial);
+digi_status_t digi_get_serial(digimesh_serial_t * serial);
 
 /**
  * @brief Stores the state information of a digi module
@@ -99,7 +99,7 @@ digi_status_t digi_get_serial(digi_serial_t * serial);
  * 
  * @return digi_status_t
  */
-digi_status_t digi_register(digi_serial_t * serial);
+digi_status_t digi_register(digimesh_serial_t * serial);
 
 
 /**
@@ -112,7 +112,7 @@ digi_status_t digi_register(digi_serial_t * serial);
  * @param [out] message         - Is used to store the resulting message.
  * @return digi_status_t 
  */
-digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
+digi_status_t digi_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
 
 
 /**
@@ -123,5 +123,17 @@ digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8
  * @return Total size of the frame in bytes.
  */
 uint8_t digimesh_get_frame_size(uint8_t * frame);
+
+/**
+ * @brief Creates a bytes array representing a DigiMesh transmit request packet. 
+ * 
+ * @param [in] destination The address of the recipient digi module.
+ * @param [in] payload A byte array of data to be sent in the frame.
+ * @param [in] payload_length The number of bytes in the payload.
+ * @param [out] generated_frame A byte array the frame is written to. 
+ * @return digi_status_t 
+ */
+digi_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);
+
 
 #endif

@@ -1,6 +1,7 @@
 #include "c_driver_digimesh.h"
 
 #include <string.h>
+#include <stdio.h>
 
 /***********************/
 /* PRIVATE DEFINITIONS */
@@ -23,6 +24,11 @@
  */
 #define AT_COMMAND_STRING_LEN 2
 
+/**
+ * @brief This is the maximum size of a payload for a digimesh frame using encryption.
+*/
+#define MAXIMUM_PAYLOAD_SIZE 65
+
 
 /*****************/
 /* PRIVATE TYPES */
@@ -34,7 +40,7 @@
  * @param serial - the serial number of the digi module
  */
 struct digi_t{
-    uint8_t serial[DIGIMESH_SERIAL_LENGTH];
+    uint8_t serial[DIGIMESH_SERIAL_NUMBER_LENGTH];
 };
 
 /**
@@ -68,6 +74,35 @@ typedef struct{
     uint8_t value[MAX_FIELD_SIZE]; 
     uint8_t checksum;                
 }digi_frame_at_command_t;
+
+/**
+ * @brief Frame structure of a message that can be used to send a payload to another digi module.
+ * 
+ * @param start_delimiter Indicates the start of an API frame
+ * @param length Number of bytes between length and checksum
+ * @param frame_type The type of the message (local at command 0x08)
+ * @param frame_id For linking the current frame with a response. If 0 the device will not emmit a response frame.
+ * @param address The address of the destination digi device.
+ * @param reserved Unused but typically set to 0xFFFE
+ * @param broadcast_radius This is the maximum number of used for broadcast transmission.
+ * @param transmit_options Set to 0xC0 for DigiMesh transmissions.
+ * @param payload_data Set to 0xC0 for DigiMesh transmissions.
+ * @param payload_length  The number of bytes in the payload field.
+ * @param checksum 0xFF minus the 8 bit sum of bytes from offset 3 to this byte (betwen length and checksum).
+ */
+typedef struct{
+    uint8_t start_delimiter;         
+    uint16_t length;               
+    digi_frame_type_t frame_type;      
+    uint8_t frame_id;               
+    uint8_t address[DIGIMESH_SERIAL_NUMBER_LENGTH];         
+    uint8_t reserved[2];           
+    uint8_t broadcast_radius;
+    uint8_t transmit_options;
+    uint8_t payload_data[MAXIMUM_PAYLOAD_SIZE];
+    uint8_t payload_length;
+    uint8_t checksum;        
+}digi_frame_transmit_request_t;
 
 
 /**
@@ -109,12 +144,38 @@ char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
  * 
  * @return status
 */
-digi_status_t calculate_crc(digi_frame_at_command_t * frame);
+digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame);
+
+/**
+ * @brief Calculates the checksum for a transmit request frame.
+ * 
+ * @param [in] frame The frame to perform the calculation on.
+ * @return digi_status_t 
+ */
+digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame);
+
+/**
+ * @brief Convert an at command frame object into a byte array.
+ * 
+ * @param [in] frame This is the frame to be converted to bytes.
+ * @param [out] bytes This is the byte array that is written to.
+ * @return digi_status_t 
+ */
+digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes);
+
+/**
+ * @brief Convert a transmit request frame object into a byte array.
+ * 
+ * @param [in] frame This is the frame to be converted to bytes.
+ * @param [out] bytes This is the byte array that is written to.
+ * @return digi_status_t 
+ */
+digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes);
 
 /********************************/
 /* PRIVATE FUNCTION DEFINITIONS */
 /********************************/
-digi_status_t calculate_crc(digi_frame_at_command_t * frame)
+digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame)
 {
     // 0xFF minus the 8-bit sum of bytes from offset 3 to this byte (between length and checksum).
     uint8_t crc = 0xFF;
@@ -135,11 +196,40 @@ digi_status_t calculate_crc(digi_frame_at_command_t * frame)
     return DIGI_OK;
 }
 
-    // memcpy(&bytes[1], &(frame->length), 2);                 // LENGTH
-digi_status_t generate_byte_array_from_frame(digi_frame_at_command_t * frame, uint8_t * bytes)
+digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame)
+{
+    // 0xFF minus the 8-bit sum of bytes from offset 3 to this byte (between length and checksum).
+    uint8_t crc = 0xFF;
+    uint8_t sum = frame->frame_type;    
+    sum += frame->frame_id;
+    
+    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_NUMBER_LENGTH; idx++)
+    {
+        sum += frame->address[idx];
+    }
+
+    sum += frame->reserved[0];
+    sum += frame->reserved[1];
+    sum += frame->broadcast_radius;
+    sum += frame->transmit_options;
+
+
+    for(uint8_t idx = 0; idx < frame->payload_length; idx++)
+    {
+        sum += frame->payload_data[idx];
+    }
+
+    crc -= sum;
+
+    frame->checksum = crc;
+
+    return DIGI_OK;
+}
+
+digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes)
 {
     bytes[0] = frame->start_delimiter;                      // START DELIMITER
-    bytes[1] = frame->length << 8;                          // LENGTH: MSB
+    bytes[1] = (frame->length >> 8) & 0xFF;                 // LENGTH: MSB
     bytes[2] = frame->length;                               // LENGTH: LSB
     bytes[3] = (frame->frame_type);                         // FRAME TYPE
     bytes[4] = (frame->frame_id);                           // FRAME ID
@@ -147,6 +237,23 @@ digi_status_t generate_byte_array_from_frame(digi_frame_at_command_t * frame, ui
     memcpy(&bytes[7], frame->value, frame->value_length);   // PARAMETER VALUE
     bytes[7+frame->value_length] = frame->checksum;         // CRC
    
+    return DIGI_OK;
+}
+
+digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes)
+{
+    bytes[0] = frame->start_delimiter;                                  // START DELIMITER
+    bytes[1] = (frame->length >> 8) & 0xFF;                             // LENGTH: MSB
+    bytes[2] = frame->length;                                           // LENGTH: LSB
+    bytes[3] = (frame->frame_type);                                     // FRAME TYPE
+    bytes[4] = (frame->frame_id);                                       // FRAME ID
+    memcpy(&bytes[5], frame->address, DIGIMESH_SERIAL_NUMBER_LENGTH);   // ADDRESS 
+    memcpy(&bytes[13], frame->reserved,2);                              // RESERVED
+    bytes[15] = (frame->broadcast_radius);                              // BROADCAST RADIUS
+    bytes[16] = (frame->transmit_options);                              // TRANSMIT OPTIONS
+    memcpy(&bytes[17], &(frame->payload_data[0]), frame->payload_length);     // PAYLOAD
+    bytes[17 + frame->payload_length] = frame->checksum;                // CHECKSUM
+    
     return DIGI_OK;
 }
 
@@ -196,7 +303,7 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
 
 void digi_init(void)
 {
-    memset(digi.serial, EMPTY_SERIAL, DIGIMESH_SERIAL_LENGTH);
+    memset(digi.serial, EMPTY_SERIAL, DIGIMESH_SERIAL_NUMBER_LENGTH);
 
     return;   
 }
@@ -205,7 +312,7 @@ bool digi_is_initialized()
 {
     // Check what the value of the digi state is to see if it's empty.
     // It's deemed empty if its serial is all empty values.
-    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_LENGTH; idx++)
+    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_NUMBER_LENGTH; idx++)
     {
         if(digi.serial[idx] == EMPTY_SERIAL){
             continue;
@@ -220,21 +327,21 @@ bool digi_is_initialized()
     return false;
 }
 
-digi_status_t digi_get_serial(digi_serial_t * serial)
+digi_status_t digi_get_serial(digimesh_serial_t * serial)
 {
-    memcpy(serial->serial, digi.serial, DIGIMESH_SERIAL_LENGTH);
+    memcpy(serial->serial, digi.serial, DIGIMESH_SERIAL_NUMBER_LENGTH);
 
     return DIGI_OK;
 }
 
-digi_status_t digi_register(digi_serial_t * serial)
+digi_status_t digi_register(digimesh_serial_t * serial)
 {
-    memcpy(digi.serial, &(serial->serial[0]), DIGIMESH_SERIAL_LENGTH);
+    memcpy(digi.serial, &(serial->serial[0]), DIGIMESH_SERIAL_NUMBER_LENGTH);
 
     return DIGI_OK;
 }
 
-digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
+digi_status_t digi_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
 {
     if(!value_is_valid(field, value, value_length))
     {
@@ -252,9 +359,8 @@ digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8
     memcpy(frame.at_command, digi_at_command_strings[field], AT_COMMAND_STRING_LEN);
     memcpy(frame.value, value, value_length);
 
-    calculate_crc(&frame);
-    generate_byte_array_from_frame(&frame, message);
-    
+    calculate_crc_at_command(&frame);
+    generate_byte_array_from_frame_at_command(&frame, message);
 
     return DIGI_OK;
 }
@@ -262,4 +368,31 @@ digi_status_t digi_generate_set_field_message(digimesh_at_command_t field, uint8
 uint8_t digimesh_get_frame_size(uint8_t * frame)
 {
   return ((frame[1] << 8 | frame[2]) + 4);
+}
+
+digi_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
+{
+    if(payload_length > MAXIMUM_PAYLOAD_SIZE)
+    {
+        return DIGI_ERROR;
+    }
+
+    digi_frame_transmit_request_t frame = {0};
+
+    frame.start_delimiter = 0x7E;                                                   // START DELIM
+    frame.length = (1 + 1 + 8 + 2 + 1 + 1 + payload_length);                        // LENGTH              frame_type(1) + frame_id(1) + address(8) + reserved(2) + broadcast_radius(1) + transmit_options(1)
+    frame.frame_type =  DIGI_FRAME_TYPE_TRANSMIT_REQUEST;                           // FRAME TYPE
+    frame.frame_id = 0x01;                                                          // FRAME ID
+    memcpy(frame.address, destination->serial, DIGIMESH_SERIAL_NUMBER_LENGTH);      // ADDRESS
+    frame.reserved[0] = 0xFF;                                                       // RESERVED 0
+    frame.reserved[1] = 0xFE;                                                       // RESERVED 1
+    frame.broadcast_radius = 0x00;                                                  // BROADCAST RADIUS
+    frame.transmit_options = 0xC0;                                                  // TRANSMIT OPTIONS
+    frame.payload_length = payload_length;                                          // Payload length
+    memcpy(frame.payload_data, payload, payload_length);                            // PAYLOAD DATA
+    calculate_crc_transmit_request(&frame);                                         // CHECKSUM
+
+    generate_byte_array_from_frame_transmit_request(&frame, generated_frame);
+
+    return DIGI_OK;
 }
