@@ -123,11 +123,11 @@ typedef struct{
 /*********************/
 
 // The local digimodule instance
-digi_t digi = {0};
+static digi_t digi = {0};
 
 // List of ascii strings representing differenct fields. Can be
 // indexed by digi_field_t.
-char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
+static char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
 {
     {'I','D'},      // The network identifiying number of the digi module
     {'C','H'},      // The network channel of the digi module
@@ -144,7 +144,7 @@ char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
  * 
  * @return status
 */
-digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame);
+static digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame);
 
 /**
  * @brief Calculates the checksum for a transmit request frame.
@@ -152,7 +152,7 @@ digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame);
  * @param [in] frame The frame to perform the calculation on.
  * @return digi_status_t 
  */
-digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame);
+static digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame);
 
 /**
  * @brief Convert an at command frame object into a byte array.
@@ -161,7 +161,7 @@ digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * fra
  * @param [out] bytes This is the byte array that is written to.
  * @return digi_status_t 
  */
-digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes);
+static digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes);
 
 /**
  * @brief Convert a transmit request frame object into a byte array.
@@ -170,12 +170,12 @@ digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t 
  * @param [out] bytes This is the byte array that is written to.
  * @return digi_status_t 
  */
-digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes);
+static digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes);
 
 /********************************/
 /* PRIVATE FUNCTION DEFINITIONS */
 /********************************/
-digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame)
+static digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame)
 {
     // 0xFF minus the 8-bit sum of bytes from offset 3 to this byte (between length and checksum).
     uint8_t crc = 0xFF;
@@ -196,7 +196,7 @@ digi_status_t calculate_crc_at_command(digi_frame_at_command_t * frame)
     return DIGI_OK;
 }
 
-digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame)
+static digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * frame)
 {
     // 0xFF minus the 8-bit sum of bytes from offset 3 to this byte (between length and checksum).
     uint8_t crc = 0xFF;
@@ -226,7 +226,7 @@ digi_status_t calculate_crc_transmit_request(digi_frame_transmit_request_t * fra
     return DIGI_OK;
 }
 
-digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes)
+static digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t * frame, uint8_t * bytes)
 {
     bytes[0] = frame->start_delimiter;                      // START DELIMITER
     bytes[1] = (frame->length >> 8) & 0xFF;                 // LENGTH: MSB
@@ -240,7 +240,7 @@ digi_status_t generate_byte_array_from_frame_at_command(digi_frame_at_command_t 
     return DIGI_OK;
 }
 
-digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes)
+static digi_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes)
 {
     bytes[0] = frame->start_delimiter;                                  // START DELIMITER
     bytes[1] = (frame->length >> 8) & 0xFF;                             // LENGTH: MSB
