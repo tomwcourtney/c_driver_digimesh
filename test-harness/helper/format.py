@@ -10,12 +10,16 @@ hex_values_list = hex_values.split()
 
 # Convert the hex values to a format suitable for a C byte array
 c_byte_array = ", ".join(f"0x{val}" for val in hex_values_list)
+bytes = " ".join(f"0x{val}" for val in hex_values_list)
+
 
 # Get the length of the array
 array_length = len(hex_values_list)
 
 # Print the byte array in C format
 print(f"uint8_t expected_frame[] = {{{c_byte_array}}};")
+
+print(f"{bytes}")
 
 # Print the length of the array
 print(f"Length of the array: {array_length}")
