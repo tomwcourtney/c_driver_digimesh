@@ -182,34 +182,34 @@ TEST(Test, parse_digimesh_local_at_response)
 }
 
 
-// // Packet type 0x90
-// TEST(Test, parse_digimesh_local_at_response)
-// {
-//     // Put received bytes plus a bunch of other bytes either side into a byte array
-//     uint8_t input_buffer[] = {0x01, 0x00, 0x03, 0x99, 0x10, 0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
-//     // uint8_t input_buffer[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
-//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF};
-//     uint8_t output_buffer[100] = {0};
+// Packet type 0x90
+TEST(Test, parse_digimesh_receive_packet)
+{
+    // Put received bytes plus a bunch of other bytes either side into a byte array
+    uint8_t input_buffer[] = {0x7E, 0x7E, 0x00, 0x01, 0x7E, 0x00, 0x0F, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x62, 0x63, 0x53, 0x7E, 0x55};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x0F, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x62, 0x63, 0x53};
+    uint8_t output_buffer[100] = {0};
 
-//     uint8_t expected_frame_length = sizeof(expected_frame)/sizeof(expected_frame[0]);
-//     uint16_t input_buffer_size = sizeof(input_buffer)/sizeof(input_buffer[0]);
+    uint8_t expected_frame_length = sizeof(expected_frame)/sizeof(expected_frame[0]);
+    uint16_t input_buffer_size = sizeof(input_buffer)/sizeof(input_buffer[0]);
 
-//     uint16_t input_tail = 0;
+    uint16_t input_tail = 0;
 
-//     uint16_t written_bytes = 0;
+    uint16_t written_bytes = 0;
+    uint16_t expected_written_bytes = 19;
 
-//     // Pass byte array to the parse funtion which remove the crap either side and store the polished digimesh packets into another circular buffer
-//     digimesh_parse_bytes(input_buffer, input_buffer_size, output_buffer, &written_bytes, &input_tail);
+    // Pass byte array to the parse funtion which remove the crap either side and store the polished digimesh packets into another circular buffer
+    digimesh_parse_bytes(input_buffer, input_buffer_size, output_buffer, &written_bytes, &input_tail);
 
-//     // Check that the input tail matches the total size of the input buffer
-//     LONGS_EQUAL(input_buffer_size, input_tail);
+    // Check that the input tail matches the total size of the input buffer
+    LONGS_EQUAL(input_buffer_size - 2, input_tail);
 
-//     // Check the number of bytes written to the output buffer matches the length of the digimesh packets in the input buffer
-//     LONGS_EQUAL(9, written_bytes);
+    // Check the number of bytes written to the output buffer matches the length of the digimesh packets in the input buffer
+    LONGS_EQUAL(expected_written_bytes, written_bytes);
 
-//     // Check that the whole digimesh packet arrived in the other buffer
-//     are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
-// }
+    // Check that the whole digimesh packet arrived in the other buffer
+    are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
+}
 
 
 /********/
