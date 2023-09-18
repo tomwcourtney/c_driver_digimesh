@@ -27,6 +27,11 @@
  */
 #define DIGIMESH_MAXIMUM_MESSAGE_SIZE 128
 
+/**
+ * @brief This is the maximum size of a payload for a digimesh frame using encryption.
+*/
+#define DIGIMESH_MAXIMUM_PAYLOAD_SIZE 65
+
 
 /****************/
 /* PUBLIC TYPES */
@@ -62,6 +67,16 @@ typedef enum{
     DIGIMESH_AT_END
 }digimesh_at_command_t;
 
+/**
+ * @brief Identifies what type of frame you want to build.
+ */
+typedef enum{
+    DIGIMESH_FRAME_TYPE_LOCAL_AT = 0x08,
+    DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST = 0x10,
+    DIGIMESH_FRAME_TYPE_LOCAL_AT_COMMAND_RESPONSE = 0x88,
+    DIGIMESH_FRAME_TYPE_RECEIVE_PACKET = 0x90,
+    DIGIMESH_FRAME_TYPE_END
+}digimesh_frame_type_t;
 
 
 
@@ -133,7 +148,7 @@ uint8_t digimesh_get_frame_size(uint8_t * frame);
  * @param [out] generated_frame A byte array the frame is written to. 
  * @return digi_status_t 
  */
-digimesh_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);
+digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);
 
 /**
  * @brief Take a byte array and then write out complete digimesh packets that were found in the byte array to another byte array.
@@ -151,12 +166,28 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
  * @brief Extracts the first digimesh packet from a byte array and stores it in a new array and removes it from
  * the original array.
  * 
- * @param input The array that the digimesh packet is in.
- * @param head The head position of the array. 
- * @param tail The tail position of the array.
- * @param new_frame The array to store the digimesh packet in.
+ * @param [in] input The array that the digimesh packet is in.
+ * @param [in] head The head position of the array.
+ * @param [out] tail The tail position of the array.
+ * @param [out] new_frame The array to store the digimesh packet in.
  * @return digimesh_status_t 
  */
 digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame);
 
+/**
+ * @brief Determines the type of a digimesh frame
+ *
+ * @param [in] frame The frame to determine the type of
+ * @return digmesh_frame_type_t
+ */
+digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame);
+
+/**
+ * @brief Extracts the payload from a receive packet frame
+ *
+ * @param [in] frame The frame to extract the payload from.
+ * @param [out] payload Byte array to store the payload in.
+ * @return uint8_t The length of the payload in bytes
+ */
+uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * payload);
 #endif

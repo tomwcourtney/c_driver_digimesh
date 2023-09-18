@@ -126,7 +126,7 @@ TEST(Test, check_set_name_frame)
 
 TEST(Test, validate_transmit_request_message)
 {
-    digimesh_serial_t destination_address = {.serial = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 , 0x00}};
+    uint8_t destination_address[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 , 0x00};
     uint8_t payload[] = {'b','i','g',' ','s','l','u','g'};
     // uint8_t payload[] = {'a'};
     uint8_t len = sizeof(payload)/sizeof(payload[0]);
@@ -135,7 +135,7 @@ TEST(Test, validate_transmit_request_message)
     uint8_t expected_frame[] = {0x7E, 0x00, 0x16, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFE, 0x00, 0xC0, 0x62, 0x69, 0x67, 0x20, 0x73, 0x6C, 0x75, 0x67, 0x24};
     // uint8_t expected_frame[] = {0x7E, 0x00, 0x0F, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFE, 0x00, 0xC0, 0x61, 0xD0};
 
-    IS_OK(digimesh_generate_transmit_request_frame(&destination_address, (unsigned char*)&payload[0], len, generated_frame));
+    IS_OK(digimesh_generate_transmit_request_frame(destination_address, (unsigned char*)&payload[0], len, generated_frame));
 
 
     LONGS_EQUAL(expected_frame[0], generated_frame[0]);                                             // Start delim
@@ -241,6 +241,41 @@ TEST(Test, extract_a_frame_from_an_array_of_frames)
 
 }
 
+TEST(Test, extract_payload_from_receive_packet)
+{
+    uint8_t frame[] = {0x7E, 0x00, 0x12, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x24};
+
+    uint8_t payload[DIGIMESH_MAXIMUM_PAYLOAD_SIZE] = {0};
+
+    uint8_t expected_payload[] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66};
+    uint8_t expected_payload_len = sizeof(expected_payload)/sizeof(expected_payload[0]);
+
+    digimesh_extract_payload_from_receive_frame(frame, payload);
+
+    are_two_message_equal(expected_payload, payload, expected_payload_len);
+}
+
+// Packet type 0x90
+TEST(Test, parse_digimesh_receive_packet2)
+{
+    // Put received bytes plus a bunch of other bytes either side into a byte array
+    uint8_t input_buffer[] = {0x7E, 0x00, 0x0E, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x03, 0x44, 0x32};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x0E, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x03, 0x44, 0x32};
+    uint8_t output_buffer[100] = {0};
+
+    uint8_t expected_frame_length = sizeof(expected_frame)/sizeof(expected_frame[0]);
+    uint16_t input_buffer_size = sizeof(input_buffer)/sizeof(input_buffer[0]);
+
+    uint16_t input_tail = 0;
+
+    uint16_t written_bytes = 0;
+
+    // Pass byte array to the parse funtion which remove the crap either side and store the polished digimesh packets into another circular buffer
+    digimesh_parse_bytes(input_buffer, input_buffer_size, output_buffer, &written_bytes, &input_tail);
+
+    // Check that the whole digimesh packet arrived in the other buffer
+    are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
+}
 
 /********/
 /* Many */

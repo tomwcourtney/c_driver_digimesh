@@ -24,11 +24,6 @@
  */
 #define AT_COMMAND_STRING_LEN 2
 
-/**
- * @brief This is the maximum size of a payload for a digimesh frame using encryption.
-*/
-#define MAXIMUM_PAYLOAD_SIZE 65
-
 /** @brief This is the start delimiter of every digimesh message*/
 #define START_DELIMITER 0x7E
 
@@ -46,17 +41,6 @@
 struct digi_t{
     uint8_t serial[DIGIMESH_SERIAL_NUMBER_LENGTH];
 };
-
-/**
- * @brief Identifies what type of frame you want to build.
- */
-typedef enum{
-    DIGIMESH_FRAME_TYPE_LOCAL_AT = 0x08,
-    DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST = 0x10,
-    DIGIMESH_FRAME_TYPE_LOCAL_AT_COMMAND_RESPONSE = 0x88,
-    DIGIMESH_FRAME_TYPE_RECEIVE_PACKET = 0x90,
-    DIGIMESH_FRAME_TYPE_END
-}digimesh_frame_type_t;
 
 /**
  * @brief Frame structure of a message that can be used to SET a field on a local digi device.
@@ -105,7 +89,7 @@ typedef struct{
     uint8_t reserved[2];           
     uint8_t broadcast_radius;
     uint8_t transmit_options;
-    uint8_t payload_data[MAXIMUM_PAYLOAD_SIZE];
+    uint8_t payload_data[DIGIMESH_MAXIMUM_PAYLOAD_SIZE];
     uint8_t payload_length;
     uint8_t checksum;        
 }digi_frame_transmit_request_t;
@@ -203,7 +187,6 @@ static uint8_t calculate_crc(uint8_t * bytes)
     return crc;
 
 }
-
 
 static digimesh_status_t calculate_crc_at_command(digi_frame_at_command_t * frame)
 {
@@ -401,9 +384,9 @@ uint8_t digimesh_get_frame_size(uint8_t * frame)
   return ((frame[1] << 8 | frame[2]) + 4);
 }
 
-digimesh_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
+digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
 {
-    if(payload_length > MAXIMUM_PAYLOAD_SIZE)
+    if(payload_length > DIGIMESH_MAXIMUM_PAYLOAD_SIZE)
     {
         return DIGIMESH_ERROR;
     }
@@ -414,7 +397,7 @@ digimesh_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * d
     frame.length = (1 + 1 + 8 + 2 + 1 + 1 + payload_length);                        // LENGTH              frame_type(1) + frame_id(1) + address(8) + reserved(2) + broadcast_radius(1) + transmit_options(1)
     frame.frame_type =  DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST;                           // FRAME TYPE
     frame.frame_id = 0x01;                                                          // FRAME ID
-    memcpy(frame.address, destination->serial, DIGIMESH_SERIAL_NUMBER_LENGTH);      // ADDRESS
+    memcpy(frame.address, destination, DIGIMESH_SERIAL_NUMBER_LENGTH);              // ADDRESS
     frame.reserved[0] = 0xFF;                                                       // RESERVED 0
     frame.reserved[1] = 0xFE;                                                       // RESERVED 1
     frame.broadcast_radius = 0x00;                                                  // BROADCAST RADIUS
@@ -544,7 +527,6 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
 
     return DIGIMESH_OK;
 }
-
 
 digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame)
 {
@@ -679,4 +661,20 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
         return DIGIMESH_ERROR;
     }
 
+}
+
+digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame)
+{
+  return frame[3];
+}
+
+uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * payload)
+{
+  uint8_t frame_len = digimesh_get_frame_size(frame);
+  uint8_t payload_len = frame_len - 16;
+
+  // Copy the payload out of the frame and into the output payload
+  memcpy(payload, frame + 15, payload_len);
+
+  return payload_len;
 }
