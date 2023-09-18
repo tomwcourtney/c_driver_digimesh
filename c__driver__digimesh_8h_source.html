@@ -145,7 +145,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>digimesh_status_t digimesh_generate_transmit_request_frame(<a class="code hl_struct" href="structdigimesh__serial__t.html">digimesh_serial_t</a> * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_buffer_size, uint8_t * output_buffer, uint16_t * written_bytes, uint16_t * input_tail);</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="astructdigimesh__serial__t_html"><div class="ttname"><a href="structdigimesh__serial__t.html">digimesh_serial_t</a></div><div class="ttdoc">Type that enforces the correct size for the serial.</div><div class="ttdef"><b>Definition</b> c_driver_digimesh.h:46</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
