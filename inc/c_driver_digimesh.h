@@ -36,9 +36,9 @@
  * @brief Return status of a digi function execution
  */
 typedef enum{
-    DIGI_OK,
-    DIGI_ERROR
-}digi_status_t;
+    DIGIMESH_OK,
+    DIGIMESH_ERROR
+}digimesh_status_t;
 
 /**
  * @brief Type that enforces the correct size for the serial.
@@ -90,7 +90,7 @@ bool digi_is_initialized(void);
  * 
  * @return digi_status_t 
  */
-digi_status_t digi_get_serial(digimesh_serial_t * serial);
+digimesh_status_t digi_get_serial(digimesh_serial_t * serial);
 
 /**
  * @brief Stores the state information of a digi module
@@ -99,7 +99,7 @@ digi_status_t digi_get_serial(digimesh_serial_t * serial);
  * 
  * @return digi_status_t
  */
-digi_status_t digi_register(digimesh_serial_t * serial);
+digimesh_status_t digi_register(digimesh_serial_t * serial);
 
 
 /**
@@ -112,7 +112,7 @@ digi_status_t digi_register(digimesh_serial_t * serial);
  * @param [out] message         - Is used to store the resulting message.
  * @return digi_status_t 
  */
-digi_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
+digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);
 
 
 /**
@@ -133,7 +133,17 @@ uint8_t digimesh_get_frame_size(uint8_t * frame);
  * @param [out] generated_frame A byte array the frame is written to. 
  * @return digi_status_t 
  */
-digi_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);
+digimesh_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);
 
-
+/**
+ * @brief Take a byte array and then write out complete digimesh packets that were found in the byte array to another byte array.
+ * NB: It is assumed that the input is not circular and will not overun and then wrap.
+ * @param [in] input_buffer The array of unparsed bytes          
+ * @param [in] input_buffer_size The number of bytes of bytes to parse in the input buffer
+ * @param [out] output_buffer The array of complete digimesh packet bytes to be written to
+ * @param [out] written_bytes The number of bytes written to the output_buffer
+ * @param [out] input_tail The position that was parsed up to in the input buffer.
+ * @return digimesh_status_t 
+ */
+digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_buffer_size, uint8_t * output_buffer, uint16_t * written_bytes, uint16_t * input_tail);
 #endif

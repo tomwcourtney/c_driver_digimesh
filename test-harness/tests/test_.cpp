@@ -8,6 +8,9 @@ extern "C"
 
 TEST_GROUP(Test) 
 {
+
+    void are_two_messages_equal(uint8_t * message_a, uint8_t * message_b, uint8_t message_length);
+
     void setup()
     {
         digi_init();
@@ -19,7 +22,7 @@ TEST_GROUP(Test)
 
     digimesh_serial_t id = {.serial = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}};
     
-    digi_status_t register_digi()
+    digimesh_status_t register_digi()
     {
         return digi_register(&id);
     }
@@ -28,7 +31,9 @@ TEST_GROUP(Test)
     {
         for( uint8_t idx = 0; idx < message_length; idx++)
         {
-            LONGS_EQUAL(message_a[idx], message_b[idx]);
+            char str[10] = {0};
+            sprintf(str, "idx: %d", idx);
+            LONGS_EQUAL_TEXT(message_a[idx], message_b[idx], str);
         }
     }
 
@@ -39,13 +44,13 @@ TEST_GROUP(Test)
         CHECK(!digi_is_initialized());
 
     #define IS_OK(status)\
-        CHECK(status == DIGI_OK);
+        CHECK(status == DIGIMESH_OK);
 
     #define IS_NOT_OK(status)\
-        CHECK(!status == DIGI_OK);
+        CHECK(!status == DIGIMESH_OK);
 
     #define ARE_MESSAGES_EQUAL(message_a, message_b, message_length) \
-        CHECK(are_two_message_equal(message_a, message_b, message_length));
+        CHECK(are_two_messages_equal(message_a, message_b, message_length));
 };
 
 /********/
@@ -146,6 +151,65 @@ TEST(Test, validate_transmit_request_message)
     are_two_message_equal(&expected_frame[17], &generated_frame[17], len);                          // Payload Data
     LONGS_EQUAL(expected_frame[17+len], generated_frame[17+len]);                                   // CRC
 }
+
+// Packet type 0x88
+TEST(Test, parse_digimesh_local_at_response)
+{
+    // Put received bytes plus a bunch of other bytes either side into a byte array
+    uint8_t input_buffer[] = {0x01, 0x00, 0x03, 0x99, 0x10, 0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
+    // uint8_t input_buffer[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF};
+    uint8_t output_buffer[100] = {0};
+
+    uint8_t expected_frame_length = sizeof(expected_frame)/sizeof(expected_frame[0]);
+    uint16_t input_buffer_size = sizeof(input_buffer)/sizeof(input_buffer[0]);
+
+    uint16_t input_tail = 0;
+
+    uint16_t written_bytes = 0;
+
+    // Pass byte array to the parse funtion which remove the crap either side and store the polished digimesh packets into another circular buffer
+    digimesh_parse_bytes(input_buffer, input_buffer_size, output_buffer, &written_bytes, &input_tail);
+
+    // Check that the input tail matches the total size of the input buffer
+    LONGS_EQUAL(input_buffer_size, input_tail);
+
+    // Check the number of bytes written to the output buffer matches the length of the digimesh packets in the input buffer
+    LONGS_EQUAL(9, written_bytes);
+
+    // Check that the whole digimesh packet arrived in the other buffer
+    are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
+}
+
+
+// // Packet type 0x90
+// TEST(Test, parse_digimesh_local_at_response)
+// {
+//     // Put received bytes plus a bunch of other bytes either side into a byte array
+//     uint8_t input_buffer[] = {0x01, 0x00, 0x03, 0x99, 0x10, 0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
+//     // uint8_t input_buffer[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x99, 0x23, 0x00, 0xFF};
+//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF};
+//     uint8_t output_buffer[100] = {0};
+
+//     uint8_t expected_frame_length = sizeof(expected_frame)/sizeof(expected_frame[0]);
+//     uint16_t input_buffer_size = sizeof(input_buffer)/sizeof(input_buffer[0]);
+
+//     uint16_t input_tail = 0;
+
+//     uint16_t written_bytes = 0;
+
+//     // Pass byte array to the parse funtion which remove the crap either side and store the polished digimesh packets into another circular buffer
+//     digimesh_parse_bytes(input_buffer, input_buffer_size, output_buffer, &written_bytes, &input_tail);
+
+//     // Check that the input tail matches the total size of the input buffer
+//     LONGS_EQUAL(input_buffer_size, input_tail);
+
+//     // Check the number of bytes written to the output buffer matches the length of the digimesh packets in the input buffer
+//     LONGS_EQUAL(9, written_bytes);
+
+//     // Check that the whole digimesh packet arrived in the other buffer
+//     are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
+// }
 
 
 /********/
