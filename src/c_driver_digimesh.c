@@ -327,6 +327,7 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
         break;
     }
 }
+
 /*******************************/
 /* PUBLIC FUNCTION DEFINITIONS */
 /*******************************/
@@ -542,4 +543,140 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
     }
 
     return DIGIMESH_OK;
+}
+
+
+digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame)
+{
+    enum{
+        START,
+        LEN0,
+        LEN1,
+        BYTES,
+        CRC
+    };
+
+    uint8_t state = START;
+
+    uint8_t frame_count = 0;
+
+    bool packet_found = false;
+    
+    for(uint16_t idx = 0; idx < *head && !packet_found; idx++)
+    {
+        // Check if the current byte is a start delimiter because if it is we must start the process again.
+        if(input[idx] == START_DELIMITER)
+        {
+            // Increment the input tail to flush out the orphaned bytes.
+            (*tail) += frame_count;
+            state = START;
+            frame_count = 0;
+        }
+
+        switch(state)
+        {
+            // Search for the next start delimiter
+            case START:
+                if(input[idx] == START_DELIMITER)
+                {
+                    // Add the start delimiter to the new frame
+                    new_frame[frame_count] = input[idx];
+                    // Count up as you add bytes to the frame
+                    frame_count++;
+                    // Switch to looking for the first byte of length data
+                    state = LEN0;
+                }
+                // If you haven't found the start delimiter then keep searching but also increment the input buffer tail as any bytes
+                // before a start delimiter are dead byte and need to be removed from the input buffer
+                else
+                {
+                    (*tail)++;
+                }
+            break;
+
+            // Get the length 0 byte and add it to the new frame
+            case LEN0:
+                new_frame[frame_count] = input[idx];
+                frame_count++;
+                
+                // Get the second length byte for the frame
+                state = LEN1;
+            break;
+
+            // Get the length 1 byte and add it to the new frame
+            case LEN1:
+                new_frame[frame_count] = input[idx];
+                frame_count++;
+                // Transition to getting the rest of the bytes for the frame
+                state = BYTES;
+            break;
+
+            case BYTES:
+
+                uint16_t payload_len = ((new_frame[1] << 8 & 0xFF) | new_frame[2]);
+                // Add bytes until frame_count - 3 as this is where the CRC is and frame_length ends.
+                if( (frame_count) < payload_len + 3)
+                {
+                    new_frame[frame_count] = input[idx];
+                    frame_count++;
+                }
+                // Swap to working out the CRC as we've collected all of the other frame bytes
+                else
+                {
+                    // Calculate the CRC from the new frame bytes
+                    uint8_t crc = calculate_crc(new_frame);
+
+                    // The very next byte in the input buffer should be the new frames CRC so check if they match
+                    if(crc == input[idx])
+                    {
+                        new_frame[frame_count] = crc;
+                        frame_count++;                    
+
+                        (*tail) += frame_count;
+
+                        packet_found = true;
+                    }
+                    else
+                    {
+                        // If the CRC doesn't match then these bytes are malformed and we need to get rid of them by advancing the
+                        // input buffer's tail position to the bytes that we're up to
+                        frame_count++;
+                        (*tail) += frame_count;
+
+                        state = START;
+                        frame_count = 0;
+                    }
+                }
+            break;
+
+            default:
+                return DIGIMESH_ERROR;
+            break;
+        }
+    }
+
+    // Make a copy of the remaining buffer contents
+    uint16_t size_of_copy = *head - *tail;
+    uint8_t copy[size_of_copy];  
+    memcpy(copy, input + *tail, size_of_copy);
+
+    // Zero the original buffer
+    memset(input, 0, *head);
+
+    // Copy the copy back into the original
+    memcpy(input, copy, size_of_copy);
+
+    // Update the head and tail values
+    *tail = 0;
+    *head = size_of_copy;
+
+    if(packet_found)
+    {
+        return DIGIMESH_OK;
+    }
+    else
+    {
+        return DIGIMESH_ERROR;
+    }
+
 }

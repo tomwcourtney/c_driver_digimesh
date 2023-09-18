@@ -9,8 +9,6 @@ extern "C"
 TEST_GROUP(Test) 
 {
 
-    void are_two_messages_equal(uint8_t * message_a, uint8_t * message_b, uint8_t message_length);
-
     void setup()
     {
         digi_init();
@@ -209,6 +207,38 @@ TEST(Test, parse_digimesh_receive_packet)
 
     // Check that the whole digimesh packet arrived in the other buffer
     are_two_message_equal(expected_frame, output_buffer, expected_frame_length);
+}
+
+TEST(Test, extract_a_frame_from_an_array_of_frames)
+{
+    // The frame of digimesh packets
+    uint8_t array[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x43, 0x48, 0x00, 0xEB, 0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x7E, 0x00, 0x0F, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x73, 0x64, 0x41};
+
+
+    
+    uint16_t head = sizeof(array)/sizeof(array[0]);
+    uint16_t tail = 0;
+
+    // The empty frame to place it into
+    uint8_t new_frame[128] = {0};
+
+    // Extract a frame
+    IS_OK(digimesh_extract_first_digimesh_packet(array, &head, &tail, new_frame));
+
+    // Check the head and tail of the array
+    LONGS_EQUAL(0, tail);
+    LONGS_EQUAL(28, head);
+
+    // Check the value of the new_frame
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x43, 0x48, 0x00, 0xEB};
+    uint8_t expected_frame_len = sizeof(expected_frame)/sizeof(expected_frame[0]);
+    are_two_message_equal(expected_frame, new_frame, expected_frame_len);
+    
+    // Check the updated value of the array
+    uint8_t expected_array[] = {0x7E, 0x00, 0x05, 0x88, 0x01, 0x4E, 0x49, 0x00, 0xDF, 0x7E, 0x00, 0x0F, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x73, 0x64, 0x41};
+    uint8_t expected_array_len = sizeof(expected_array)/sizeof(expected_array[0]);
+    are_two_message_equal(expected_array, array, expected_array_len);
+
 }
 
 

@@ -146,4 +146,17 @@ digimesh_status_t digimesh_generate_transmit_request_frame(digimesh_serial_t * d
  * @return digimesh_status_t 
  */
 digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_buffer_size, uint8_t * output_buffer, uint16_t * written_bytes, uint16_t * input_tail);
+
+/**
+ * @brief Extracts the first digimesh packet from a byte array and stores it in a new array and removes it from
+ * the original array.
+ * 
+ * @param input The array that the digimesh packet is in.
+ * @param head The head position of the array. 
+ * @param tail The tail position of the array.
+ * @param new_frame The array to store the digimesh packet in.
+ * @return digimesh_status_t 
+ */
+digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame);
+
 #endif
