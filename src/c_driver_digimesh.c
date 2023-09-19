@@ -169,6 +169,17 @@ static digimesh_status_t generate_byte_array_from_frame_at_command(digi_frame_at
  */
 static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_frame_transmit_request_t * frame, uint8_t * bytes);
 
+/**
+ * @fn void shuffle_array_bytes_down(uint8_t*, uint16_t*, uint16_t*)
+ * @brief Removes some bytes from the beginning of a byte array and then slides the remaining bytes into the
+ * 0th position
+ *
+ * @param [out] input The input byte array to be shuffled down.
+ * @param [out] tail The read position of the input array.
+ * @param [out] head The write position of the input array.
+ */
+static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t * head);
+
 /********************************/
 /* PRIVATE FUNCTION DEFINITIONS */
 /********************************/
@@ -311,6 +322,24 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
     }
 }
 
+static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t * head)
+{
+  // Make a copy of the remaining buffer contents
+  uint16_t size_of_copy = *head - *tail;
+  uint8_t copy[size_of_copy];
+  memcpy(copy, input + *tail, size_of_copy);
+
+  // Zero the original buffer
+  memset(input, 0, *head);
+
+  // Copy the copy back into the original
+  memcpy(input, copy, size_of_copy);
+
+  // Update the head and tail values
+  *tail = 0;
+  *head = size_of_copy;
+}
+
 /*******************************/
 /* PUBLIC FUNCTION DEFINITIONS */
 /*******************************/
@@ -411,7 +440,7 @@ digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination
     return DIGIMESH_OK;
 }
 
-digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_buffer_size, uint8_t * output_buffer, uint16_t * written_bytes, uint16_t * input_tail)
+digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, uint16_t * input_tail, uint8_t * output, uint16_t * output_head)
 {
     enum{
         START,
@@ -426,10 +455,10 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
     uint8_t new_frame[MAX_FRAME_SIZE];
     uint8_t frame_count = 0;
     
-    for(uint16_t idx = 0; idx < input_buffer_size; idx++)
+    for(uint16_t idx = 0; idx < *input_head; idx++)
     {
         // Check if the current byte is a start delimiter because if it is we must start the process again.
-        if(input_buffer[idx] == START_DELIMITER)
+        if(input[idx] == START_DELIMITER)
         {
             // Increment the input tail to flush out the orphaned bytes.
             (*input_tail) += frame_count;
@@ -441,10 +470,10 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
         {
             // Search for the next start delimiter
             case START:
-                if(input_buffer[idx] == START_DELIMITER)
+                if(input[idx] == START_DELIMITER)
                 {
                     // Add the start delimiter to the new frame
-                    new_frame[frame_count] = input_buffer[idx];
+                    new_frame[frame_count] = input[idx];
                     // Count up as you add bytes to the frame
                     frame_count++;
                     // Switch to looking for the first byte of length data
@@ -460,7 +489,7 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
 
             // Get the length 0 byte and add it to the new frame
             case LEN0:
-                new_frame[frame_count] = input_buffer[idx];
+                new_frame[frame_count] = input[idx];
                 frame_count++;
                 
                 // Get the second length byte for the frame
@@ -469,7 +498,7 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
 
             // Get the length 1 byte and add it to the new frame
             case LEN1:
-                new_frame[frame_count] = input_buffer[idx];
+                new_frame[frame_count] = input[idx];
                 frame_count++;
                 // Transition to getting the rest of the bytes for the frame
                 state = BYTES;
@@ -481,7 +510,7 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
                 // Add bytes until frame_count - 3 as this is where the CRC is and frame_length ends.
                 if( (frame_count) < payload_len + 3)
                 {
-                    new_frame[frame_count] = input_buffer[idx];
+                    new_frame[frame_count] = input[idx];
                     frame_count++;
                 }
                 // Swap to working out the CRC as we've collected all of the other frame bytes
@@ -491,15 +520,15 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
                     uint8_t crc = calculate_crc(new_frame);
 
                     // The very next byte in the input buffer should be the new frames CRC so check if they match
-                    if(crc == input_buffer[idx])
+                    if(crc == input[idx])
                     {
                         new_frame[frame_count] = crc;
                         frame_count++;                    
 
                         // The crc matched so we have a whole digimesh packet which we now copy into the output buffer.
-                        memcpy(output_buffer, new_frame, frame_count);
+                        memcpy(output, new_frame, frame_count);
                         (*input_tail) += frame_count;
-                        (*written_bytes) += frame_count;
+                        (*output_head) += frame_count;
                         
                         // Start again
                         state = START;
@@ -524,6 +553,9 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input_buffer, uint16_t input_bu
             break;
         }
     }
+
+    // If the input buffer read position was moved forward then shuffle the bytes down.
+    shuffle_array_bytes_down(input, input_tail, input_head);
 
     return DIGIMESH_OK;
 }
@@ -637,20 +669,7 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
         }
     }
 
-    // Make a copy of the remaining buffer contents
-    uint16_t size_of_copy = *head - *tail;
-    uint8_t copy[size_of_copy];  
-    memcpy(copy, input + *tail, size_of_copy);
-
-    // Zero the original buffer
-    memset(input, 0, *head);
-
-    // Copy the copy back into the original
-    memcpy(input, copy, size_of_copy);
-
-    // Update the head and tail values
-    *tail = 0;
-    *head = size_of_copy;
+    shuffle_array_bytes_down(input, tail, head);
 
     if(packet_found)
     {
@@ -660,7 +679,6 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
     {
         return DIGIMESH_ERROR;
     }
-
 }
 
 digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame)
