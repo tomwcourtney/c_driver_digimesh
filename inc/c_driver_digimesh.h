@@ -25,12 +25,12 @@
 /**
  * @brief The maximum size of a byte array representing a message
  */
-#define DIGIMESH_MAXIMUM_MESSAGE_SIZE 128
+#define DIGIMESH_MAXIMUM_FRAME_SIZE 128
 
 /**
  * @brief This is the maximum size of a payload for a digimesh frame using encryption.
 */
-#define DIGIMESH_MAXIMUM_PAYLOAD_SIZE 65
+#define DIGIMESH_MAX_PAYLOAD_SIZE 65
 
 
 /****************/
@@ -192,4 +192,14 @@ digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame);
  * @return uint8_t The length of the payload in bytes
  */
 uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * payload);
+
+/**
+ * @fn uint16_t digimesh_required_packets(uint32_t)
+ * @brief Calculates how many digimesh packets you need to send a payload.
+ *
+ * @param payload_len
+ * @return uint16_t the number of packets required.
+ */
+uint16_t digimesh_required_packets(uint32_t payload_len);
+
 #endif

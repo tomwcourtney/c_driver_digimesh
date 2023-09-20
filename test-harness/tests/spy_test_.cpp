@@ -2,7 +2,7 @@
 
 extern "C" 
 {
-    #include "../spies/spy_.h"
+    #include "../../../c_driver_digimesh/test-harness/spies/spy_.h"
 }
 
 

@@ -2,7 +2,7 @@
 
 extern "C" 
 {
-    #include "c_driver_digimesh.h"
+    #include "../../../c_driver_digimesh/inc/c_driver_digimesh.h"
 }
 
 
@@ -74,8 +74,8 @@ TEST(Test, check_state_is_not_empty_after_initialization)
 
 TEST(Test, check_that_you_cant_make_a_value_larger_than_max_value_len)
 {
-    uint8_t name[DIGIMESH_MAXIMUM_MESSAGE_SIZE+1] = {0};
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t name[DIGIMESH_MAXIMUM_FRAME_SIZE+1] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
     IS_OK(!digimesh_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
 }
@@ -83,7 +83,7 @@ TEST(Test, check_that_you_cant_make_a_value_larger_than_max_value_len)
 TEST(Test, validate_channel_value)
 {
     uint8_t channel[] = {0x0A};
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
     IS_NOT_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel , sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
 }
@@ -91,7 +91,7 @@ TEST(Test, validate_channel_value)
 TEST(Test, check_set_network_id_frame)
 {
     uint8_t id[] = {0x0A};
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_ID, id, sizeof(id)/sizeof(id[0]), generated_frame));
     
@@ -103,7 +103,7 @@ TEST(Test, check_set_network_id_frame)
 TEST(Test, check_set_channel_frame)
 {
     uint8_t channel[] = {0x0B};
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
 
@@ -115,7 +115,7 @@ TEST(Test, check_set_channel_frame)
 TEST(Test, check_set_name_frame)
 {
     uint8_t name[] = {'c','r','u','m','b'};
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_NI, name , sizeof(name)/sizeof(name[0]), &generated_frame[0]));
 
@@ -130,7 +130,7 @@ TEST(Test, validate_transmit_request_message)
     uint8_t payload[] = {'b','i','g',' ','s','l','u','g'};
     // uint8_t payload[] = {'a'};
     uint8_t len = sizeof(payload)/sizeof(payload[0]);
-    uint8_t generated_frame[DIGIMESH_MAXIMUM_MESSAGE_SIZE] = {0};
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
     
     uint8_t expected_frame[] = {0x7E, 0x00, 0x16, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFE, 0x00, 0xC0, 0x62, 0x69, 0x67, 0x20, 0x73, 0x6C, 0x75, 0x67, 0x24};
     // uint8_t expected_frame[] = {0x7E, 0x00, 0x0F, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFE, 0x00, 0xC0, 0x61, 0xD0};
@@ -241,7 +241,7 @@ TEST(Test, extract_payload_from_receive_packet)
 {
     uint8_t frame[] = {0x7E, 0x00, 0x12, 0x90, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0x01, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x24};
 
-    uint8_t payload[DIGIMESH_MAXIMUM_PAYLOAD_SIZE] = {0};
+    uint8_t payload[DIGIMESH_MAX_PAYLOAD_SIZE] = {0};
 
     uint8_t expected_payload[] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66};
     uint8_t expected_payload_len = sizeof(expected_payload)/sizeof(expected_payload[0]);

@@ -1,4 +1,4 @@
-#include "c_driver_digimesh.h"
+#include "../../c_driver_digimesh/inc/c_driver_digimesh.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -89,7 +89,7 @@ typedef struct{
     uint8_t reserved[2];           
     uint8_t broadcast_radius;
     uint8_t transmit_options;
-    uint8_t payload_data[DIGIMESH_MAXIMUM_PAYLOAD_SIZE];
+    uint8_t payload_data[DIGIMESH_MAX_PAYLOAD_SIZE];
     uint8_t payload_length;
     uint8_t checksum;        
 }digi_frame_transmit_request_t;
@@ -283,7 +283,7 @@ static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_fr
 
 bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
 {
-    if(value_length > DIGIMESH_MAXIMUM_MESSAGE_SIZE)
+    if(value_length > DIGIMESH_MAXIMUM_FRAME_SIZE)
     {
         return false;
     }
@@ -415,7 +415,7 @@ uint8_t digimesh_get_frame_size(uint8_t * frame)
 
 digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
 {
-    if(payload_length > DIGIMESH_MAXIMUM_PAYLOAD_SIZE)
+    if(payload_length > DIGIMESH_MAX_PAYLOAD_SIZE)
     {
         return DIGIMESH_ERROR;
     }
@@ -695,4 +695,12 @@ uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * p
   memcpy(payload, frame + 15, payload_len);
 
   return payload_len;
+}
+
+uint16_t digimesh_required_packets(uint32_t payload_len)
+{
+  uint16_t remainder = payload_len / DIGIMESH_MAX_PAYLOAD_SIZE;
+  uint16_t modulo = payload_len % DIGIMESH_MAX_PAYLOAD_SIZE;
+
+  return remainder + ((modulo > 0) ? 1 : 0);
 }
