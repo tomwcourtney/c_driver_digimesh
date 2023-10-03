@@ -505,7 +505,7 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, u
             break;
 
             case BYTES:
-
+               ;
                 uint16_t payload_len = ((new_frame[1] << 8 & 0xFF) | new_frame[2]);
                 // Add bytes until frame_count - 3 as this is where the CRC is and frame_length ends.
                 if( (frame_count) < payload_len + 3)
@@ -626,7 +626,7 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
             break;
 
             case BYTES:
-
+            ;
                 uint16_t payload_len = ((new_frame[1] << 8 & 0xFF) | new_frame[2]);
                 // Add bytes until frame_count - 3 as this is where the CRC is and frame_length ends.
                 if( (frame_count) < payload_len + 3)
@@ -661,6 +661,7 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
                         frame_count = 0;
                     }
                 }
+
             break;
 
             default:
