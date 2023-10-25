@@ -272,7 +272,111 @@ TEST(Test, parse_digimesh_receive_packet2)
     are_two_message_equal(expected_frame, output, expected_frame_head);
 }
 
+// SLEEP MODE (SM)
+TEST(Test, check_set_sleep_mode_cyclic_sleep)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
-// /********/
-// /* Many */
-// /********/
+    uint8_t value = 8; // Cyclic sleep mode
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SM, &value, sizeof(value), &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x53, 0x4D, 0x08, 0x4E};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+
+// SLEEP NUMBER (SN)
+TEST(Test, set_sleep_number)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    uint8_t value = 1; 
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SN, &value, 1, &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x53, 0x4E, 0x01, 0x54};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+// SLEEP OPTIONS (SO)
+TEST(Test, check_set_sleep_options)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    uint8_t value = 0x01;
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SO, &value, sizeof(value), &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x53, 0x4F, 0x01, 0x53};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+// WAKE TIME (ST)
+TEST(Test, check_set_wake_time)
+{
+    uint8_t value = 0x7D;
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_ST, &value, sizeof(value), &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x53, 0x54, 0x7D, 0xD2};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+
+// SLEEP PERIOD (SP)
+TEST(Test, check_set_sleep_period)
+{
+    uint8_t value = 0xC8;
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SP, &value, 1, &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x53, 0x50, 0xC8, 0x8B};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+// HOST DELAY (WH) 
+TEST(Test, check_set_host_delay)
+{
+    uint8_t value = 0;
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_WH, &value, 1, &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x57, 0x48, 0x00, 0x57};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
+
+// // AT COMMAND RESPONSE (0x88) - OK
+// TEST(Test, parse_at_command_response_ok)
+// {
+//     uint8_t channel[] = {0x0B};
+//     uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+//     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+
+//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
+
+//     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+// }
+
+// // AT COMMAND RESPONSE (0x88) - ERROR
+// TEST(Test, parse_at_command_response_error)
+// {
+//     uint8_t channel[] = {0x0B};
+//     uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+//     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+
+//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
+
+//     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+// }
+

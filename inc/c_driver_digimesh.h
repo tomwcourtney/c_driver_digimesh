@@ -64,8 +64,38 @@ typedef enum{
     DIGIMESH_AT_ID,
     DIGIMESH_AT_CH,
     DIGIMESH_AT_NI,
+    DIGIMESH_AT_SM,
+    DIGIMESH_AT_SN,
+    DIGIMESH_AT_SO,
+    DIGIMESH_AT_ST,
+    DIGIMESH_AT_SP,
+    DIGIMESH_AT_WH,
     DIGIMESH_AT_END
 }digimesh_at_command_t;
+
+typedef enum
+{
+  DIGIMESH_AT_STATUS_OK,
+  DIGIMESH_AT_STATUS_ERROR,
+  DIGIMESH_AT_STATUS_INVALID_COMMAND,
+  DIGIMESH_AT_STATUS_INVALID_PARAMETER,
+  DIGIMESH_AT_STATUS_END
+}digimesh_at_status_t;
+
+/**
+ * @brief Length of the values for each AT command in bytes.
+ */
+typedef enum{
+    DIGIMESH_AT_ID_LEN = 2,
+    DIGIMESH_AT_CH_LEN = 1,
+    DIGIMESH_AT_NI_LEN = 20,
+    DIGIMESH_AT_SM_LEN = 1,
+    DIGIMESH_AT_SN_LEN = 2,
+    DIGIMESH_AT_SO_LEN = 2,
+    DIGIMESH_AT_ST_LEN = 3,
+    DIGIMESH_AT_SP_LEN = 3,
+    DIGIMESH_AT_WH_LEN = 2,
+}digimesh_at_command_value_len_t;
 
 /**
  * @brief Identifies what type of frame you want to build.
@@ -79,6 +109,24 @@ typedef enum{
 }digimesh_frame_type_t;
 
 
+/**
+ * @brief For identifying what digi device field you want to set or get.
+ */
+typedef enum{
+    DIGIMESH_SLEEP_NODE = 8,
+    DIGIMESH_SLEEP_SUPPORT = 7,
+}digimesh_sleep_mode_t;
+
+
+/**
+ * @brief List of strings representing the different at commands.
+ */
+extern char digimesh_at_command_strings[DIGIMESH_AT_END][3];
+
+/**
+ * @brief Strings representing the different statuses for a local at command response.
+ */
+extern char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20];
 
 /********************************/
 /* PUBLIC FUNCTION DECLARATIONS */
@@ -201,5 +249,24 @@ uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * p
  * @return uint16_t the number of packets required.
  */
 uint16_t digimesh_required_packets(uint32_t payload_len);
+
+/**
+ * @fn digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t*)
+ * @brief Get the at command that the local at command response is for from the
+ * frame.
+ *
+ * @param frame The response packet.
+ * @return The command that the response is for.
+ */
+digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t * frame);
+
+/**
+ * @fn digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t*)
+ * @brief Get the status of the response to a local at command.
+ *
+ * @param frame The response packet.
+ * @return The status in the response packet.
+ */
+digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame);
 
 #endif

@@ -3,6 +3,31 @@
 #include <string.h>
 #include <stdio.h>
 
+/********************/
+/* PUBLIC VARIALBES */
+/********************/
+char digimesh_at_command_strings[DIGIMESH_AT_END][3] =
+{
+    "ID",
+    "CH",
+    "NI",
+    "SM",
+    "SN",
+    "SO",
+    "ST",
+    "SP",
+    "WH",
+};
+
+char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20] =
+{
+    "OKAY",
+    "ERROR",
+    "INVALID_COMMAND",
+    "INVALID_PARAMETER"
+};
+
+
 /***********************/
 /* PRIVATE DEFINITIONS */
 /***********************/
@@ -121,7 +146,13 @@ static char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
 {
     {'I','D'},      // The network identifiying number of the digi module
     {'C','H'},      // The network channel of the digi module
-    {'N','I'}       // The name of the digi module
+    {'N','I'},      // The name of the digi module
+    {'S','M'},      // Sleep Mode
+    {'S','N'},      // Sleep Number
+    {'S','O'},      // Sleep Options
+    {'S','T'},      // Wake Time
+    {'S','P'},      // Sleep Period
+    {'W','H'},      // Host Delay
 };
 
 /*********************************/
@@ -179,6 +210,8 @@ static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_fr
  * @param [out] head The write position of the input array.
  */
 static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t * head);
+
+static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data_length );
 
 /********************************/
 /* PRIVATE FUNCTION DEFINITIONS */
@@ -288,6 +321,13 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
         return false;
     }
 
+    if(value_length <= 0)
+    {
+        return false;
+    }
+
+    uint32_t big_value = convert_little_endian_array_to_32bit(value, value_length);
+
     switch(field)
     {
         case DIGIMESH_AT_ID:
@@ -316,6 +356,50 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
             }
         break;
 
+        case DIGIMESH_AT_SM:
+            if(value_length > DIGIMESH_AT_SM_LEN)
+            {
+                return false;
+            }
+            return (big_value <= 8) && (big_value >= 0);
+        break;
+
+        case DIGIMESH_AT_SN:
+            if(value_length > DIGIMESH_AT_SN_LEN)
+            {
+                return false;
+            }
+            return (big_value <= 0xFFFF) && (big_value >= 1);;
+        break;
+
+        case DIGIMESH_AT_SO:
+            if(value_length > DIGIMESH_AT_SO_LEN)
+            {
+                return false;
+            }
+
+            return (big_value <= 0x13E) && (big_value >= 0);
+        break;
+
+        case DIGIMESH_AT_ST:
+            if(value_length > DIGIMESH_AT_ST_LEN)
+            {
+                return false;
+            }
+            return (big_value <= 0x36EE80 ) && (big_value >= 1);
+        break;
+
+        case DIGIMESH_AT_SP:
+            return (big_value <= 0x13E) && (big_value >= 0);;
+        break;
+
+        case DIGIMESH_AT_WH:
+            return (big_value <= 0x13E) && (big_value >= 0);;
+        break;
+
+
+
+
         default:
             return false;
         break;
@@ -338,6 +422,18 @@ static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t 
   // Update the head and tail values
   *tail = 0;
   *head = size_of_copy;
+}
+
+static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data_length )
+{
+    uint32_t num = 0;
+
+    for(uint8_t i = 0; i < data_length; i++)
+    {
+        num |= (data[i] << (i*8));
+    }
+
+    return num;
 }
 
 /*******************************/
@@ -705,3 +801,47 @@ uint16_t digimesh_required_packets(uint32_t payload_len)
 
   return remainder + ((modulo > 0) ? 1 : 0);
 }
+
+digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t * frame)
+{
+  char at_command[2] = {0};
+  at_command[0] = frame[5];
+  at_command[1] = frame[6];
+
+  for (int i = 0; i < DIGIMESH_AT_END; i++) {
+    if (digi_at_command_strings[i][0] == at_command[0] && digi_at_command_strings[i][1] == at_command[1])
+    {
+      return i; // Match found, return the index
+    }
+  }
+
+  return DIGIMESH_AT_END;
+}
+
+digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame)
+{
+  digimesh_at_status_t status = frame[7];
+  return status;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
