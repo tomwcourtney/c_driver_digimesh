@@ -354,29 +354,26 @@ TEST(Test, check_set_host_delay)
     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
 }
 
-// // AT COMMAND RESPONSE (0x88) - OK
-// TEST(Test, parse_at_command_response_ok)
-// {
-//     uint8_t channel[] = {0x0B};
-//     uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+// Serial High (SH) 
+TEST(Test, get_serial_high)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
-//     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SH, NULL, 0, &generated_frame[0]));
 
-//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x04, 0x08, 0x01, 0x53, 0x48, 0x5B};
 
-//     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
-// }
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}
 
-// // AT COMMAND RESPONSE (0x88) - ERROR
-// TEST(Test, parse_at_command_response_error)
-// {
-//     uint8_t channel[] = {0x0B};
-//     uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+// Serial Low (SL) 
+TEST(Test, get_serial_low)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
 
-//     IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, channel, sizeof(channel)/sizeof(channel[0]), &generated_frame[0]));
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_SL, NULL, 0, &generated_frame[0]));
 
-//     uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x43, 0x48, 0x0B, 0x60};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x04, 0x08, 0x01, 0x53, 0x4C, 0x57};
 
-//     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
-// }
-
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+}

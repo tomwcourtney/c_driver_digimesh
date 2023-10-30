@@ -70,6 +70,8 @@ typedef enum{
     DIGIMESH_AT_ST,
     DIGIMESH_AT_SP,
     DIGIMESH_AT_WH,
+    DIGIMESH_AT_SH,
+    DIGIMESH_AT_SL,
     DIGIMESH_AT_END
 }digimesh_at_command_t;
 
@@ -95,6 +97,8 @@ typedef enum{
     DIGIMESH_AT_ST_LEN = 3,
     DIGIMESH_AT_SP_LEN = 3,
     DIGIMESH_AT_WH_LEN = 2,
+    DIGIMESH_AT_SH_LEN = 0,
+    DIGIMESH_AT_SL_LEN = 0,
 }digimesh_at_command_value_len_t;
 
 /**
@@ -186,6 +190,15 @@ digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field
  * @return Total size of the frame in bytes.
  */
 uint8_t digimesh_get_frame_size(uint8_t * frame);
+
+/**
+ * @fn uint8_t digimesh_get_locat_at_response_size(uint8_t*)
+ * @brief Get the number of bytes in the response field of a local at command response.
+ *
+ * @param frame The total response frame.
+ * @return The number of bytes in the response.
+ */
+uint8_t digimesh_get_local_at_response_size(uint8_t * frame);
 
 /**
  * @brief Creates a bytes array representing a DigiMesh transmit request packet. 

@@ -17,6 +17,8 @@ char digimesh_at_command_strings[DIGIMESH_AT_END][3] =
     "ST",
     "SP",
     "WH",
+    "SH",
+    "SL",
 };
 
 char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20] =
@@ -153,6 +155,8 @@ static char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
     {'S','T'},      // Wake Time
     {'S','P'},      // Sleep Period
     {'W','H'},      // Host Delay
+    {'S','H'},      // Serial High
+    {'S','L'},      // Serial Low
 };
 
 /*********************************/
@@ -291,7 +295,10 @@ static digimesh_status_t generate_byte_array_from_frame_at_command(digi_frame_at
     bytes[3] = (frame->frame_type);                         // FRAME TYPE
     bytes[4] = (frame->frame_id);                           // FRAME ID
     memcpy(&bytes[5], frame->at_command,2);                 // AT COMMAND 
-    memcpy(&bytes[7], frame->value, frame->value_length);   // PARAMETER VALUE
+    if(frame->value_length != 0)
+    {
+        memcpy(&bytes[7], frame->value, frame->value_length);   // PARAMETER VALUE
+    }
     bytes[7+frame->value_length] = frame->checksum;         // CRC
    
     return DIGIMESH_OK;
@@ -321,12 +328,12 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
         return false;
     }
 
-    if(value_length <= 0)
-    {
-        return false;
-    }
+    uint32_t big_value = 0;
 
-    uint32_t big_value = convert_little_endian_array_to_32bit(value, value_length);
+    if(value_length != 0)
+    {
+        big_value = convert_little_endian_array_to_32bit(value, value_length);
+    }
 
     switch(field)
     {
@@ -394,11 +401,16 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
         break;
 
         case DIGIMESH_AT_WH:
-            return (big_value <= 0x13E) && (big_value >= 0);;
+          return (big_value <= 0x13E) && (big_value >= 0);
         break;
 
+        case DIGIMESH_AT_SH:
+          return (value_length <= DIGIMESH_AT_SH_LEN);
+        break;
 
-
+        case DIGIMESH_AT_SL:
+          return (value_length <= DIGIMESH_AT_SL_LEN);
+        break;
 
         default:
             return false;
@@ -507,6 +519,13 @@ digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field
 uint8_t digimesh_get_frame_size(uint8_t * frame)
 {
   return ((frame[1] << 8 | frame[2]) + 4);
+}
+
+uint8_t digimesh_get_local_at_response_size(uint8_t * frame)
+{
+  // It's minus 5 because look in the manual that's why.
+  uint8_t len = digimesh_get_frame_size(frame) - 5;
+  return len;
 }
 
 digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
@@ -822,6 +841,17 @@ digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame)
 {
   digimesh_at_status_t status = frame[7];
   return status;
+}
+
+digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uint8_t * value)
+{
+  // Locate the start of the values in the response
+  uint8_t response_size = digimesh_get_local_at_response_size(frame);
+
+  // Response starts at 8. Look in the manual if you don't believe me.
+  memcpy(value, (uint8_t*)&frame[8], response_size);
+
+  return DIGIMESH_OK;
 }
 
 
