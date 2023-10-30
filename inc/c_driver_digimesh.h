@@ -282,4 +282,6 @@ digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t * frame);
  */
 digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame);
 
+digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uint8_t * value);
+
 #endif
