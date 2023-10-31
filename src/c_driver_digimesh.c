@@ -323,6 +323,11 @@ static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_fr
 
 bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
 {
+    if(value_length == 0)
+    {
+      return true;
+    }
+
     if(value_length > DIGIMESH_MAXIMUM_FRAME_SIZE)
     {
         return false;
@@ -334,6 +339,7 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
     {
         big_value = convert_little_endian_array_to_32bit(value, value_length);
     }
+
 
     switch(field)
     {
@@ -524,10 +530,9 @@ uint8_t digimesh_get_frame_size(uint8_t * frame)
 uint8_t digimesh_get_local_at_response_size(uint8_t * frame)
 {
   // It's minus 5 because look in the manual that's why.
-  uint8_t len = digimesh_get_frame_size(frame) - 5;
+  uint8_t len = (frame[1] << 8 | frame[2]) - 5;
   return len;
 }
-
 digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame)
 {
     if(payload_length > DIGIMESH_MAX_PAYLOAD_SIZE)

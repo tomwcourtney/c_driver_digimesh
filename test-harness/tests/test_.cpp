@@ -377,3 +377,15 @@ TEST(Test, get_serial_low)
 
     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
 }
+
+TEST(Test, get_channel)
+{
+    uint8_t generated_frame[DIGIMESH_MAXIMUM_FRAME_SIZE] = {0};
+
+    IS_OK(digimesh_generate_at_command_frame(DIGIMESH_AT_CH, NULL, 0, &generated_frame[0]));
+
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x04, 0x08, 0x01, 0x43, 0x48, 0x6B};
+
+    are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
+
+}
