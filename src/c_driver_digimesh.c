@@ -19,6 +19,7 @@ char digimesh_at_command_strings[DIGIMESH_AT_END][3] =
     "WH",
     "SH",
     "SL",
+    "WR",
 };
 
 char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20] =
@@ -157,6 +158,7 @@ static char digi_at_command_strings[DIGIMESH_AT_END][AT_COMMAND_STRING_LEN] =
     {'W','H'},      // Host Delay
     {'S','H'},      // Serial High
     {'S','L'},      // Serial Low
+    {'W','R'},      // Serial Low
 };
 
 /*********************************/
@@ -321,7 +323,37 @@ static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_fr
     return DIGIMESH_OK;
 }
 
-bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
+static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t * head)
+{
+  // Make a copy of the remaining buffer contents
+  uint16_t size_of_copy = *head - *tail;
+  uint8_t copy[size_of_copy];
+  memcpy(copy, input + *tail, size_of_copy);
+
+  // Zero the original buffer
+  memset(input, 0, *head);
+
+  // Copy the copy back into the original
+  memcpy(input, copy, size_of_copy);
+
+  // Update the head and tail values
+  *tail = 0;
+  *head = size_of_copy;
+}
+
+static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data_length )
+{
+    uint32_t num = 0;
+
+    for(uint8_t i = 0; i < data_length; i++)
+    {
+        num |= (data[i] << (i*8));
+    }
+
+    return num;
+}
+
+static bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
 {
     if(value_length == 0)
     {
@@ -422,36 +454,6 @@ bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_
             return false;
         break;
     }
-}
-
-static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t * head)
-{
-  // Make a copy of the remaining buffer contents
-  uint16_t size_of_copy = *head - *tail;
-  uint8_t copy[size_of_copy];
-  memcpy(copy, input + *tail, size_of_copy);
-
-  // Zero the original buffer
-  memset(input, 0, *head);
-
-  // Copy the copy back into the original
-  memcpy(input, copy, size_of_copy);
-
-  // Update the head and tail values
-  *tail = 0;
-  *head = size_of_copy;
-}
-
-static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data_length )
-{
-    uint32_t num = 0;
-
-    for(uint8_t i = 0; i < data_length; i++)
-    {
-        num |= (data[i] << (i*8));
-    }
-
-    return num;
 }
 
 /*******************************/

@@ -72,6 +72,7 @@ typedef enum{
     DIGIMESH_AT_WH,
     DIGIMESH_AT_SH,
     DIGIMESH_AT_SL,
+    DIGIMESH_AT_WR,
     DIGIMESH_AT_END
 }digimesh_at_command_t;
 
@@ -99,6 +100,7 @@ typedef enum{
     DIGIMESH_AT_WH_LEN = 2,
     DIGIMESH_AT_SH_LEN = 0,
     DIGIMESH_AT_SL_LEN = 0,
+    DIGIMESH_AT_WR_LEN = 0,
 }digimesh_at_command_value_len_t;
 
 /**
