@@ -128,90 +128,92 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    DIGIMESH_AT_WH,</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    DIGIMESH_AT_SH,</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    DIGIMESH_AT_SL,</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    DIGIMESH_AT_END</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}digimesh_at_command_t;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keyword">typedef</span> <span class="keyword">enum</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>{</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  DIGIMESH_AT_STATUS_OK,</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  DIGIMESH_AT_STATUS_ERROR,</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  DIGIMESH_AT_STATUS_INVALID_COMMAND,</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  DIGIMESH_AT_STATUS_INVALID_PARAMETER,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  DIGIMESH_AT_STATUS_END</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}digimesh_at_status_t;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    DIGIMESH_AT_ID_LEN = 2,</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    DIGIMESH_AT_CH_LEN = 1,</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    DIGIMESH_AT_NI_LEN = 20,</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    DIGIMESH_AT_SM_LEN = 1,</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    DIGIMESH_AT_SN_LEN = 2,</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    DIGIMESH_AT_SO_LEN = 2,</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    DIGIMESH_AT_ST_LEN = 3,</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    DIGIMESH_AT_SP_LEN = 3,</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    DIGIMESH_AT_WH_LEN = 2,</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    DIGIMESH_AT_SH_LEN = 0,</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    DIGIMESH_AT_SL_LEN = 0,</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>}digimesh_at_command_value_len_t;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    DIGIMESH_FRAME_TYPE_LOCAL_AT = 0x08,</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST = 0x10,</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    DIGIMESH_FRAME_TYPE_LOCAL_AT_COMMAND_RESPONSE = 0x88,</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    DIGIMESH_FRAME_TYPE_RECEIVE_PACKET = 0x90,</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    DIGIMESH_FRAME_TYPE_END</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}digimesh_frame_type_t;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    DIGIMESH_SLEEP_NODE = 8,</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    DIGIMESH_SLEEP_SUPPORT = 7,</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>}digimesh_sleep_mode_t;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="keyword">extern</span> <span class="keywordtype">char</span> digimesh_at_command_strings[DIGIMESH_AT_END][3];</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="keyword">extern</span> <span class="keywordtype">char</span> digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20];</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">/********************************/</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment">/* PUBLIC FUNCTION DECLARATIONS */</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    DIGIMESH_AT_WR,</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    DIGIMESH_AT_END</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}digimesh_at_command_t;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>{</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  DIGIMESH_AT_STATUS_OK,</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  DIGIMESH_AT_STATUS_ERROR,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  DIGIMESH_AT_STATUS_INVALID_COMMAND,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  DIGIMESH_AT_STATUS_INVALID_PARAMETER,</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  DIGIMESH_AT_STATUS_END</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>}digimesh_at_status_t;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    DIGIMESH_AT_ID_LEN = 2,</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    DIGIMESH_AT_CH_LEN = 1,</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    DIGIMESH_AT_NI_LEN = 20,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    DIGIMESH_AT_SM_LEN = 1,</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    DIGIMESH_AT_SN_LEN = 2,</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    DIGIMESH_AT_SO_LEN = 2,</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    DIGIMESH_AT_ST_LEN = 3,</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    DIGIMESH_AT_SP_LEN = 3,</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    DIGIMESH_AT_WH_LEN = 2,</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    DIGIMESH_AT_SH_LEN = 0,</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    DIGIMESH_AT_SL_LEN = 0,</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    DIGIMESH_AT_WR_LEN = 0,</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>}digimesh_at_command_value_len_t;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    DIGIMESH_FRAME_TYPE_LOCAL_AT = 0x08,</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST = 0x10,</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    DIGIMESH_FRAME_TYPE_LOCAL_AT_COMMAND_RESPONSE = 0x88,</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    DIGIMESH_FRAME_TYPE_RECEIVE_PACKET = 0x90,</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    DIGIMESH_FRAME_TYPE_END</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>}digimesh_frame_type_t;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="keyword">typedef</span> <span class="keyword">enum</span>{</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    DIGIMESH_SLEEP_NODE = 8,</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    DIGIMESH_SLEEP_SUPPORT = 7,</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>}digimesh_sleep_mode_t;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="keyword">extern</span> <span class="keywordtype">char</span> digimesh_at_command_strings[DIGIMESH_AT_END][3];</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="keyword">extern</span> <span class="keywordtype">char</span> digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20];</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="comment">/********************************/</span></div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="keywordtype">void</span> digi_init(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="keywordtype">bool</span> digi_is_initialized(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span> </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>digimesh_status_t digi_get_serial(<a class="code hl_struct" href="structdigimesh__serial__t.html">digimesh_serial_t</a> * serial);</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>digimesh_status_t digi_register(<a class="code hl_struct" href="structdigimesh__serial__t.html">digimesh_serial_t</a> * serial);</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span> </div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>uint8_t digimesh_get_frame_size(uint8_t * frame);</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span> </div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>uint8_t digimesh_get_local_at_response_size(uint8_t * frame);</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, uint16_t * input_tail, uint8_t * output, uint16_t * output_head);</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame);</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span> </div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame);</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * payload);</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span> </div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>uint16_t digimesh_required_packets(uint32_t payload_len);</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t * frame);</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame);</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uint8_t * value);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment">/* PUBLIC FUNCTION DECLARATIONS */</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment">/********************************/</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="keywordtype">void</span> digi_init(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span> </div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="keywordtype">bool</span> digi_is_initialized(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>digimesh_status_t digi_get_serial(<a class="code hl_struct" href="structdigimesh__serial__t.html">digimesh_serial_t</a> * serial);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>digimesh_status_t digi_register(<a class="code hl_struct" href="structdigimesh__serial__t.html">digimesh_serial_t</a> * serial);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value,  uint8_t value_length, uint8_t * message);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>uint8_t digimesh_get_frame_size(uint8_t * frame);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span> </div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>uint8_t digimesh_get_local_at_response_size(uint8_t * frame);</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination, uint8_t * payload, uint8_t payload_length, uint8_t * generated_frame);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> </div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, uint16_t * input_tail, uint8_t * output, uint16_t * output_head);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16_t * head, uint16_t * tail, uint8_t * new_frame);</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>digimesh_frame_type_t digimesh_get_frame_type(uint8_t * frame);</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>uint8_t digimesh_extract_payload_from_receive_frame(uint8_t * frame, uint8_t * payload);</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>uint16_t digimesh_required_packets(uint32_t payload_len);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>digimesh_at_command_t digimesh_get_command_from_at_response(uint8_t * frame);</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame);</div>
 <div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span> </div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uint8_t * value);</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span> </div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="astructdigimesh__serial__t_html"><div class="ttname"><a href="structdigimesh__serial__t.html">digimesh_serial_t</a></div><div class="ttdoc">Type that enforces the correct size for the serial.</div><div class="ttdef"><b>Definition</b> c_driver_digimesh.h:51</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
