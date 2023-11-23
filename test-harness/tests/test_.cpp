@@ -401,7 +401,6 @@ TEST(Test, handle_payload_containing_start_delimiter)
     uint16_t head = sizeof(expected_frame);
     uint16_t tail = 0;
     uint8_t new_frame[100] = {0};
-    CHECK(digimesh_extract_first_digimesh_packet(expected_frame, &head, &tail, new_frame)== DIGIMESH_OK);
-
+    CHECK(digimesh_extract_first_digimesh_packet(expected_frame, &head, &tail, new_frame) == DIGIMESH_OK);
 }
 

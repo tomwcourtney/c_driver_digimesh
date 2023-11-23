@@ -581,13 +581,13 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, u
     for(uint16_t idx = 0; idx < *input_head; idx++)
     {
         // Check if the current byte is a start delimiter because if it is we must start the process again.
-        if(input[idx] == START_DELIMITER)
-        {
-            // Increment the input tail to flush out the orphaned bytes.
-            (*input_tail) += frame_count;
-            state = START;
-            frame_count = 0;
-        }
+//        if(input[idx] == START_DELIMITER)
+//        {
+//            // Increment the input tail to flush out the orphaned bytes.
+//            (*input_tail) += frame_count;
+//            state = START;
+//            frame_count = 0;
+//        }
 
         switch(state)
         {
