@@ -327,7 +327,7 @@ static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t 
 {
   // Make a copy of the remaining buffer contents
   uint16_t size_of_copy = *head - *tail;
-  uint8_t copy[size_of_copy];
+  uint8_t * copy = malloc(size_of_copy*sizeof(uint8_t));
   memcpy(copy, input + *tail, size_of_copy);
 
   // Zero the original buffer
@@ -339,6 +339,7 @@ static void shuffle_array_bytes_down(uint8_t * input, uint16_t * tail, uint16_t 
   // Update the head and tail values
   *tail = 0;
   *head = size_of_copy;
+  free(copy);
 }
 
 static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data_length )
@@ -700,14 +701,14 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
     
     for(uint16_t idx = 0; idx < *head && !packet_found; idx++)
     {
-        // Check if the current byte is a start delimiter because if it is we must start the process again.
-        if(input[idx] == START_DELIMITER)
-        {
-            // Increment the input tail to flush out the orphaned bytes.
-            (*tail) += frame_count;
-            state = START;
-            frame_count = 0;
-        }
+        //// Check if the current byte is a start delimiter because if it is we must start the process again.
+        //if(input[idx] == START_DELIMITER)
+        //{
+        //    // Increment the input tail to flush out the orphaned bytes.
+        //    (*tail) += frame_count;
+        //    state = START;
+        //    frame_count = 0;
+        //}
 
         switch(state)
         {

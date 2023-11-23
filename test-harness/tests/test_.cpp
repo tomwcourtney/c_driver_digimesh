@@ -389,3 +389,19 @@ TEST(Test, get_channel)
     are_two_message_equal(expected_frame, generated_frame, digimesh_get_frame_size(expected_frame));
 
 }
+
+/* There's a possibility that a payload will contain a start delimiter so the parser needs to appropriately handle this scenario.*/
+TEST(Test, handle_payload_containing_start_delimiter)
+{
+    //uint8_t expected_frame[] = {0x7E, 0x00, 0x0F, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFE, 0x00, 0x00, 0x7E, 0x73};
+    //uint8_t expected_frame[] = {0x7E, 0x00, 0x01, 0x7E, 0x73};
+    uint8_t expected_frame[] = {0x7E, 0x00, 0x05, 0x08, 0x01, 0x44, 0x38, 0x7E, 0xFC};
+
+    // Parse the input which has 0x7E in the payload and check that the output is good
+    uint16_t head = sizeof(expected_frame);
+    uint16_t tail = 0;
+    uint8_t new_frame[100] = {0};
+    CHECK(digimesh_extract_first_digimesh_packet(expected_frame, &head, &tail, new_frame)== DIGIMESH_OK);
+
+}
+
