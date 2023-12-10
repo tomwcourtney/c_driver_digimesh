@@ -58,6 +58,8 @@ char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20] =
 
 #define MAX_FRAME_SIZE 128
 
+#define TRANSMIT_OPTIONS 0xC0
+
 /*****************/
 /* PRIVATE TYPES */
 /*****************/
@@ -143,6 +145,9 @@ typedef struct{
 
 // The local digimodule instance
 static digi_t digi = {0};
+
+// Increments the frame id for each new frame.
+static uint8_t frame_id_count = 1;
 
 // List of ascii strings representing differenct fields. Can be
 // indexed by digi_field_t.
@@ -513,7 +518,7 @@ digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field
         .start_delimiter = 0x7E,
         .length = (1 + 1 + 2 + value_length),       // sizeof(frame_type) + sizeof(frame_id) + sizeof(at_command) + value_length
         .frame_type = DIGIMESH_FRAME_TYPE_LOCAL_AT,
-        .frame_id = 0x01,
+        .frame_id = frame_id_count,
         .value_length = value_length
     };
 
@@ -522,6 +527,13 @@ digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field
 
     calculate_crc_at_command(&frame);
     generate_byte_array_from_frame_at_command(&frame, message);
+
+    frame_id_count++;
+
+    if(frame_id_count == 0)
+    {
+      frame_id_count++;
+    }
 
     return DIGIMESH_OK;
 }
@@ -548,18 +560,25 @@ digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination
 
     frame.start_delimiter = 0x7E;                                                   // START DELIM
     frame.length = (1 + 1 + 8 + 2 + 1 + 1 + payload_length);                        // LENGTH              frame_type(1) + frame_id(1) + address(8) + reserved(2) + broadcast_radius(1) + transmit_options(1)
-    frame.frame_type =  DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST;                           // FRAME TYPE
-    frame.frame_id = 0x01;                                                          // FRAME ID
+    frame.frame_type =  DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST;                       // FRAME TYPE
+    frame.frame_id = frame_id_count;                                                // FRAME ID
     memcpy(frame.address, destination, DIGIMESH_SERIAL_NUMBER_LENGTH);              // ADDRESS
     frame.reserved[0] = 0xFF;                                                       // RESERVED 0
     frame.reserved[1] = 0xFE;                                                       // RESERVED 1
     frame.broadcast_radius = 0x00;                                                  // BROADCAST RADIUS
-    frame.transmit_options = 0xC0;                                                  // TRANSMIT OPTIONS
+    frame.transmit_options = TRANSMIT_OPTIONS;                                      // TRANSMIT OPTIONS
     frame.payload_length = payload_length;                                          // Payload length
     memcpy(frame.payload_data, payload, payload_length);                            // PAYLOAD DATA
     calculate_crc_transmit_request(&frame);                                         // CHECKSUM
 
     generate_byte_array_from_frame_transmit_request(&frame, generated_frame);
+
+    frame_id_count++;
+
+    if(frame_id_count == 0)
+    {
+      frame_id_count++;
+    }
 
     return DIGIMESH_OK;
 }
