@@ -32,6 +32,10 @@
 */
 #define DIGIMESH_MAX_PAYLOAD_SIZE 65
 
+/**
+ * @brief Position of frame id in transmit request and local at command.
+ */
+#define DIGIMESH_POS_FRAME_ID 4
 
 /****************/
 /* PUBLIC TYPES */
