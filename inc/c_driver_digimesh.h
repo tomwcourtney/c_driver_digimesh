@@ -41,7 +41,7 @@
  * @def DIGIMESH_POS_TRANSMIT_STATUS_STATUS
  * @brief Position of the transmit status in a transmit status message.
  */
-#define DIGIMESH_POS_TRANSMIT_STATUS_STATUS 5
+#define DIGIMESH_POS_EXTENDED_TRANSMIT_STATUS_STATUS 8
 
 /****************/
 /* PUBLIC TYPES */

@@ -890,7 +890,7 @@ uint8_t digimesh_get_frame_id(uint8_t * frame)
 
 uint8_t digi_get_transmit_status(uint8_t * frame)
 {
-  return frame[DIGIMESH_POS_TRANSMIT_STATUS_STATUS];
+  return frame[DIGIMESH_POS_EXTENDED_TRANSMIT_STATUS_STATUS];
 }
 
 
