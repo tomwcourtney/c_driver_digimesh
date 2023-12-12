@@ -883,6 +883,15 @@ digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uin
 }
 
 
+uint8_t digimesh_get_frame_id(uint8_t * frame)
+{
+  return frame[DIGIMESH_POS_FRAME_ID];
+}
+
+uint8_t digi_get_transmit_status(uint8_t * frame)
+{
+  return frame[DIGIMESH_POS_TRANSMIT_STATUS_STATUS];
+}
 
 
 

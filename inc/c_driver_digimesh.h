@@ -37,6 +37,12 @@
  */
 #define DIGIMESH_POS_FRAME_ID 4
 
+/**
+ * @def DIGIMESH_POS_TRANSMIT_STATUS_STATUS
+ * @brief Position of the transmit status in a transmit status message.
+ */
+#define DIGIMESH_POS_TRANSMIT_STATUS_STATUS 5
+
 /****************/
 /* PUBLIC TYPES */
 /****************/
@@ -119,6 +125,11 @@ typedef enum{
     DIGIMESH_FRAME_TYPE_END
 }digimesh_frame_type_t;
 
+
+typedef enum
+{
+  DIGIMESH_TRANSMIT_STATUS_SUCCESS = 0x00
+}digimesh_transmit_status_t;
 
 /**
  * @brief For identifying what digi device field you want to set or get.
@@ -291,4 +302,21 @@ digimesh_at_status_t digimesh_get_status_from_at_response(uint8_t * frame);
 
 digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uint8_t * value);
 
+/**
+ * @fn uint8_t digimesh_get_frame_id(uint8_t*)
+ * @brief Extract the frame id from a digimesh frame
+ *
+ * @param frame Byte array representing a digimesh frame.
+ * @return The frame id.
+ */
+uint8_t digimesh_get_frame_id(uint8_t * frame);
+
+/**
+ * @fn uint8_t digi_get_transmit_status(uint8_t*)
+ * @brief Extract the transmit status from a transmit status message.
+ *
+ * @param frame Byte array representing a digimesh frame.
+ * @return The transmit status.
+ */
+uint8_t digi_get_transmit_status(uint8_t * frame);
 #endif
