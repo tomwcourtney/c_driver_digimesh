@@ -669,13 +669,14 @@ digimesh_status_t digimesh_parse_bytes(uint8_t * input, uint16_t * input_head, u
                         frame_count++;                    
 
                         // The crc matched so we have a whole digimesh packet which we now copy into the output buffer.
-                        memcpy(output, new_frame, frame_count);
+                        memcpy(output+*output_head, new_frame, frame_count);
                         (*input_tail) += frame_count;
                         (*output_head) += frame_count;
                         
                         // Start again
                         state = START;
                         frame_count = 0;
+
                     }
                     else
                     {
@@ -792,6 +793,7 @@ digimesh_status_t digimesh_extract_first_digimesh_packet(uint8_t * input, uint16
                         (*tail) += frame_count;
 
                         packet_found = true;
+
                     }
                     else
                     {
