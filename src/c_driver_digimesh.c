@@ -70,7 +70,7 @@ char digimesh_at_status_strings[DIGIMESH_AT_STATUS_END+1][20] =
  * @param serial - the serial number of the digi module
  */
 struct digi_t{
-    uint8_t serial[DIGIMESH_SERIAL_NUMBER_LENGTH];
+    uint8_t serial[DIGI_SERIAL_LEN];
 };
 
 /**
@@ -116,7 +116,7 @@ typedef struct{
     uint16_t length;               
     digimesh_frame_type_t frame_type;      
     uint8_t frame_id;               
-    uint8_t address[DIGIMESH_SERIAL_NUMBER_LENGTH];         
+    uint8_t address[DIGI_SERIAL_LEN];         
     uint8_t reserved[2];           
     uint8_t broadcast_radius;
     uint8_t transmit_options;
@@ -272,7 +272,7 @@ static digimesh_status_t calculate_crc_transmit_request(digi_frame_transmit_requ
     uint8_t sum = frame->frame_type;    
     sum += frame->frame_id;
     
-    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_NUMBER_LENGTH; idx++)
+    for(uint8_t idx = 0; idx < DIGI_SERIAL_LEN; idx++)
     {
         sum += frame->address[idx];
     }
@@ -319,7 +319,7 @@ static digimesh_status_t generate_byte_array_from_frame_transmit_request(digi_fr
     bytes[2] = frame->length;                                           // LENGTH: LSB
     bytes[3] = (frame->frame_type);                                     // FRAME TYPE
     bytes[4] = (frame->frame_id);                                       // FRAME ID
-    memcpy(&bytes[5], frame->address, DIGIMESH_SERIAL_NUMBER_LENGTH);   // ADDRESS 
+    memcpy(&bytes[5], frame->address, DIGI_SERIAL_LEN);   // ADDRESS 
     memcpy(&bytes[13], frame->reserved,2);                              // RESERVED
     bytes[15] = (frame->broadcast_radius);                              // BROADCAST RADIUS
     bytes[16] = (frame->transmit_options);                              // TRANSMIT OPTIONS
@@ -469,7 +469,7 @@ static bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t
 
 void digi_init(void)
 {
-    memset(digi.serial, EMPTY_SERIAL, DIGIMESH_SERIAL_NUMBER_LENGTH);
+    memset(digi.serial, EMPTY_SERIAL, DIGI_SERIAL_LEN);
 
     return;   
 }
@@ -478,7 +478,7 @@ bool digi_is_initialized()
 {
     // Check what the value of the digi state is to see if it's empty.
     // It's deemed empty if its serial is all empty values.
-    for(uint8_t idx = 0; idx < DIGIMESH_SERIAL_NUMBER_LENGTH; idx++)
+    for(uint8_t idx = 0; idx < DIGI_SERIAL_LEN; idx++)
     {
         if(digi.serial[idx] == EMPTY_SERIAL){
             continue;
@@ -495,14 +495,14 @@ bool digi_is_initialized()
 
 digimesh_status_t digi_get_serial(digimesh_serial_t * serial)
 {
-    memcpy(serial->serial, digi.serial, DIGIMESH_SERIAL_NUMBER_LENGTH);
+    memcpy(serial->serial, digi.serial, DIGI_SERIAL_LEN);
 
     return DIGIMESH_OK;
 }
 
 digimesh_status_t digi_register(digimesh_serial_t * serial)
 {
-    memcpy(digi.serial, &(serial->serial[0]), DIGIMESH_SERIAL_NUMBER_LENGTH);
+    memcpy(digi.serial, &(serial->serial[0]), DIGI_SERIAL_LEN);
 
     return DIGIMESH_OK;
 }
@@ -562,7 +562,7 @@ digimesh_status_t digimesh_generate_transmit_request_frame(uint8_t * destination
     frame.length = (1 + 1 + 8 + 2 + 1 + 1 + payload_length);                        // LENGTH              frame_type(1) + frame_id(1) + address(8) + reserved(2) + broadcast_radius(1) + transmit_options(1)
     frame.frame_type =  DIGIMESH_FRAME_TYPE_TRANSMIT_REQUEST;                       // FRAME TYPE
     frame.frame_id = frame_id_count;                                                // FRAME ID
-    memcpy(frame.address, destination, DIGIMESH_SERIAL_NUMBER_LENGTH);              // ADDRESS
+    memcpy(frame.address, destination, DIGI_SERIAL_LEN);              // ADDRESS
     frame.reserved[0] = 0xFF;                                                       // RESERVED 0
     frame.reserved[1] = 0xFE;                                                       // RESERVED 1
     frame.broadcast_radius = 0x00;                                                  // BROADCAST RADIUS

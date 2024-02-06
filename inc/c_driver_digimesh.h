@@ -20,7 +20,7 @@
 /**
  * @brief Bytes in a digi module serial number. The serial number is also the address of a digi module when sending a message.
  */
-#define DIGIMESH_SERIAL_NUMBER_LENGTH 8
+#define DIGI_SERIAL_LEN 8
 
 /**
  * @brief The maximum size of a byte array representing a message
@@ -59,7 +59,7 @@ typedef enum{
  * @brief Type that enforces the correct size for the serial.
  */
 typedef struct{
-    uint8_t serial[DIGIMESH_SERIAL_NUMBER_LENGTH];
+    uint8_t serial[DIGI_SERIAL_LEN];
 }digimesh_serial_t;
 
 /**
