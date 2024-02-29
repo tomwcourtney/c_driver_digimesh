@@ -360,7 +360,7 @@ static uint32_t convert_little_endian_array_to_32bit(uint8_t* data, uint8_t data
     return num;
 }
 
-static bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t value_length)
+static bool value_is_valid(digimesh_at_command_t field, int16_t * value, uint8_t value_length)
 {
     if(value_length == 0)
     {
@@ -372,11 +372,11 @@ static bool value_is_valid(digimesh_at_command_t field, uint8_t * value, uint8_t
         return false;
     }
 
-    uint32_t big_value = 0;
+    int32_t big_value = 0;
 
     if(value_length != 0)
     {
-        big_value = convert_little_endian_array_to_32bit(value, value_length);
+        big_value = convert_little_endian_array_to_32bit((uint8_t*)value, value_length);
     }
 
 
@@ -507,7 +507,7 @@ digimesh_status_t digi_register(digimesh_serial_t * serial)
     return DIGIMESH_OK;
 }
 
-digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, uint8_t * value, uint8_t value_length, uint8_t * message)
+digimesh_status_t digimesh_generate_at_command_frame(digimesh_at_command_t field, int16_t * value, uint8_t value_length, uint8_t * message)
 {
     if(!value_is_valid(field, value, value_length))
     {
@@ -881,7 +881,7 @@ digimesh_at_status_t digimesh_get_at_command_response_value(uint8_t * frame, uin
   // Response starts at 8. Look in the manual if you don't believe me.
   memcpy(value, (uint8_t*)&frame[8], response_size);
 
-  return DIGIMESH_OK;
+  return DIGIMESH_AT_STATUS_OK;
 }
 
 
